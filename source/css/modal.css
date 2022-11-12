@@ -1,0 +1,143 @@
+.modal-header{
+    background-color: #F1F3F4;
+}
+.exit{
+    font-size: 18px;
+}
+.modal{
+    display: none;
+    top:50%;
+    left: 50%;
+    transform: translate(-50%,-50%);
+    background-color: #fff;
+    width: 500px;
+    height: 65%;
+    box-shadow: rgba(0, 0, 0, 0.35) 0px 5px 15px;
+    color:black;
+    border-radius: 10px;
+    animation: scaleUp 0.6s ease;
+    overflow-y: hidden;
+
+}
+.modal-header{
+    justify-content:flex-end;
+    padding:20px;
+    cursor:move;
+}
+
+.modal-body{
+    padding: 20px;
+    overflow-y: scroll;
+    height: calc(100% - 65px);
+}
+.event-title{
+    height: 40px;
+    outline: none;
+    font-size: 20px;
+    border:transparent;
+    width: 100%;
+    overflow: scroll;
+    font-weight: bold;
+    padding:10px;
+    border-bottom: 2px solid #0d6efd;
+}
+.clock{
+    margin-right: 20px;
+}
+.thu-ngay-thang{
+    pointer-events: none;
+    margin-right: 20px;
+}
+.event-time{
+    font-size: 18px;
+}
+.minus{
+    margin:0 5px 0 5px;
+    padding: 5px;
+}
+.event{
+    margin-bottom:20px;
+}
+.op:hover{
+    background-color: var(--color-item-hover);
+}
+.op{
+    padding:5px;
+    border-radius: 5px;
+}
+#description-form{
+
+    width: 90%;
+    position: relative;
+    left:50%;
+    transform: translateX(-50%);
+    outline: none;
+    padding:10px;
+    font-size:16px ;
+}
+.btn-save{
+    position: relative;
+    left: 50%;
+    height: 50px;
+    width: 100px;
+    transform: translateX(-50%);
+}
+@keyframes scaleUp{
+    0%{
+        transform: scale(0)  translate(-100%,-100%);
+        left:-20px;
+        top:-40px;
+    
+    }
+    100%{
+        transform: scale(1) translate(-50%,-50%) ;
+    
+
+    }
+}
+
+/* ---------------------custom scrollbar--------------------- */
+/* width */
+.modal-body::-webkit-scrollbar {
+    width: 10px;
+    border-radius: 10px;
+}
+  
+/* Track */
+.modal-body::-webkit-scrollbar-track {
+    background: #f1f1f1; 
+    border-radius: 10px;
+}
+   
+  /* Handle */
+.modal-body::-webkit-scrollbar-thumb {
+    background: #888;
+    border-radius: 10px; 
+}
+.modal-body::-webkit-scrollbar-thumb:hover {
+    background: #555;
+    border-radius: 10px;
+}
+.thoi-gian{
+    position: relative;
+}
+.timing-table{
+    display: none;
+    z-index: 100;
+    background-color: #fff;
+    width: 100px;
+    position:absolute;
+    height: 150px;
+    box-shadow: rgba(0, 0, 0, 0.35) 0px 5px 15px;
+    overflow-y: scroll;
+    left: 50px;
+}
+.timing-table ul li{
+    cursor: pointer;
+    text-align: center;
+    
+    
+}
+.timing-table ul li:hover{
+    text-decoration: underline;
+}

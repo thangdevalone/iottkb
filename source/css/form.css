@@ -1,0 +1,342 @@
+.branch-container {
+  width: 100vw;
+  height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background:url("../img/bg-01.jpg");
+  background-position: center;
+  background-repeat: no-repeat;
+  background-size: cover;
+  color:black;
+}
+.form{
+  border-top:5px solid white ;
+  border-bottom:5px solid white ;
+
+  width: 50%;
+  background-color: white;
+  height: 70%;
+  border-radius: 20px;
+  max-width: 500px;
+  min-width: 300px;
+  max-height: 650px;
+  min-height: 400px;
+  box-shadow: rgba(0, 0, 0, 0.35) 0px 5px 15px;
+  padding:10px 20px 10px 20px;
+  display: flex;
+  align-items: center;
+  flex-direction: column;
+}
+.messColor{
+  font-size: 10px;
+  font-weight: bold;
+
+}
+/* width */
+
+.login-form{
+  height: 65%;
+  width: 95%;
+  display: flex;
+  align-items: center;
+  flex-direction: column;
+}
+.register-form{
+  height: 100%;
+  width: 95%;
+  display: flex;
+  align-items: center;
+  flex-direction: column;
+}
+.form .btn-submit{
+  padding: 10px 20px;
+}
+.form__header{
+  margin-bottom: 50px;
+}
+.form__header span{
+  font-size: 14px;
+  
+}
+.group {
+
+  position: relative;
+  margin-bottom: 20px;
+  width: 80%;
+}
+.group label {
+  color: #d2d2d2;
+  font-size: 15px;
+  font-weight: 300;
+  position: absolute;
+  pointer-events: none;
+  top: 50%;
+  transform: translateY(-50%);
+  left: 10px;
+  transition: 0.2s ease all;
+}
+.group input {
+  
+  color: black;
+  font-size: 15px;
+  padding: 0px 5px 0px 10px;
+  display: block;
+  outline: none;
+  border: none;
+  width: 100%;
+  border-radius: 5px;
+  height: 50px;
+  padding: 0 10px;
+  border: 1px solid #b2bac4;
+}
+.group label{
+  color:#565a5f;
+  font-weight: 400;
+}
+
+input:focus{
+  border:2px solid #1a73e8;
+}
+input.used ~ label,
+input:focus ~ label{
+  background-color: white;
+  border-radius:10px ;
+  padding: 5px;
+  top: 0px;
+  font-size: 14px;
+}
+input:focus ~ label{
+  color: #1a73e8 !important;
+}
+input.used ~ label{
+
+  color: #b2bacb ;
+}
+
+.other-login{
+  height: 25%;
+  margin-top: 30px;
+  text-align: center;
+}
+.other-login__button img{
+  width: 100%;
+}
+.other-login__button{
+  margin-top: 20px;
+}
+.other-login__button .btn{
+  border-radius: 50%;
+  width: 40px;
+  height: 40px;
+  margin-left: 10px;
+  display: inline-flex;
+  justify-content: center;
+  align-items: center;
+  border: none;
+  box-shadow: rgba(0, 0, 0, 0.35) 0px 5px 15px;
+  transition: all 0.25s;
+}
+.other-login__button i{
+  font-size: 100%;
+}
+#btn-fb{
+  background-color: blue;
+}
+#btn-gg{
+  background-color: red;
+}
+#btn-ms{
+  background-color:white;
+}
+.other-login__button .btn:hover{
+  transform: scale(1.2);
+}
+.span-dk{
+  cursor: pointer;
+  color:#1a73e8;
+  text-decoration: underline;
+  font-weight: 500;
+}
+.row-custom > div{
+  display: flex;
+}
+.row-custom{
+  display: flex;
+  width: 80%;
+  justify-content:space-between;
+}
+.row-custom .group{
+  width: 90%;
+}
+.flex-start{
+  justify-content: flex-start;
+}
+.flex-end{
+  justify-content: flex-end;
+}
+.btn-random{
+  height: 30px;
+  font-size: 12px;
+  margin-bottom: 5px;
+  text-align: start;
+}
+.register{
+  height: 75%;
+}
+.w-80{
+  width: 80%;
+}
+.form-check{
+  margin-top: 10px;
+}
+
+.form fieldset:not(:first-of-type) {
+  display: none;
+}
+fieldset{
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-direction: column;
+}
+
+/* --------------------------------- */
+.field-1,.field-2{
+  display:none;
+}
+
+/*headings*/
+.fs-title {
+  font-size: 18px;
+  text-transform: uppercase;
+  color: #2C3E50;
+  margin-bottom: 10px;
+  letter-spacing: 2px;
+  font-weight: bold;
+}
+
+.fs-subtitle {
+  font-weight: normal;
+  font-size: 13px;
+  color: #666;
+  margin-bottom: 20px;
+}
+
+/*progressbar*/
+#progressbar {
+  width: 80%;
+  margin-bottom: 30px;
+  margin-left: auto;
+  margin-right: auto;
+  overflow: hidden;
+  /*CSS counters to number the steps*/
+  counter-reset: step;
+}
+
+#progressbar li {
+  text-align: center;
+  list-style-type: none;
+  color: black;
+  text-transform: uppercase;
+  font-size: 10px;
+  font-weight: bold;
+  width: 50%;
+  float: left;
+  position: relative;
+  letter-spacing: 1px;
+}
+
+#progressbar li:before {
+  content: counter(step);
+  counter-increment: step;
+  position: relative;
+  z-index: 2;
+  width: 24px;
+  height: 24px;
+  box-shadow: rgba(50, 50, 93, 0.25) 0px 6px 12px -2px, rgba(0, 0, 0, 0.3) 0px 3px 7px -3px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-size: 12px;
+  color: #333;
+  background: #DEF5E5;
+  border-radius: 25px;
+  margin: 0 auto 10px auto;
+}
+
+/*progressbar connectors*/
+#progressbar li::after {
+  content: '';
+  width: 100%;
+  height: 3px;
+  background: #DEF5E5;
+  position: absolute;
+  left: -50%;
+  top: 11px;
+  z-index: 1; /*put it behind the numbers*/
+}
+
+#progressbar li:first-child::after {
+  /*connector not needed before the first step*/
+  content: none;
+}
+
+/*marking active/completed steps green*/
+/*The number of the step and the connector before it = green*/
+#progressbar li.active-li:before, #progressbar li.active-li::after {
+  background: #ee0979;
+
+  color: white;
+}
+
+
+.trans-l-active{
+  animation: tranLeft 0.4s ease-in forwards;
+}
+.trans-r-active{
+  animation: tranRight 0.4s ease-in forwards;
+}
+@keyframes tranLeft{
+  0%{
+    transform: translateX(-30px);
+    opacity: 0;
+  }
+  50% {
+    transform: translateX(30px);
+    opacity: 0;
+  }
+  100% {
+    transform: translateX(0px);
+    opacity: 1;
+  }
+}
+@keyframes tranRight{
+  0% {
+    transform: translateX(30px);
+    opacity: 0;
+  }
+  50% {
+    transform: translateX(-30px);
+    opacity: 0;
+  }
+  100% {
+    transform: translateX(0px);
+    opacity: 1;
+  }
+}
+.container-btn{
+  display: flex;
+  width: 80%;
+  justify-content: space-around;
+  align-items: center;
+  margin-top: 30px;
+}
+.btn-custom-1{
+  padding:10px 20px;
+}
+.nextForm{
+  margin-top: 30px;
+
+}
