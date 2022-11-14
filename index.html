@@ -1,302 +1,192 @@
 <!DOCTYPE html>
 <html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <link
-      rel="stylesheet"
-      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.2.0/css/all.min.css"
-      integrity="sha512-xh6O/CkQoPOWDdYTDqeRdPCVd1SpvCA9XXcUnZS2FmJNp1coAFzvtCN9BmamE+4aHK8yyUHUSCcJHgXloTyT2A=="
-      crossorigin="anonymous"
-      referrerpolicy="no-referrer"
-    />
-    <link
-      href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.1/dist/css/bootstrap.min.css"
-      rel="stylesheet"
-      integrity="sha384-iYQeCzEYFbKjA/T2uDLTpkwGzCiq6soy8tYaI1GyVh/UjpbCx/TYkiZhlZB6+fzT"
-      crossorigin="anonymous"
-    />
 
-    <link rel="stylesheet" href="./source/css/style.css" />
-    <link rel="stylesheet" href="./source/css/calendar.css" />
-    <link rel="stylesheet" href="./source/css/modal.css" />
-    <link rel="stylesheet" href="./source/css/toast.css" />
-    <link rel="stylesheet" href="./source/css/form.css" />
+<head>
+  <meta charset="UTF-8" />
+  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.2.0/css/all.min.css"
+    integrity="sha512-xh6O/CkQoPOWDdYTDqeRdPCVd1SpvCA9XXcUnZS2FmJNp1coAFzvtCN9BmamE+4aHK8yyUHUSCcJHgXloTyT2A=="
+    crossorigin="anonymous" referrerpolicy="no-referrer" />
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.1/dist/css/bootstrap.min.css" rel="stylesheet"
+    integrity="sha384-iYQeCzEYFbKjA/T2uDLTpkwGzCiq6soy8tYaI1GyVh/UjpbCx/TYkiZhlZB6+fzT" crossorigin="anonymous" />
 
-    <title>IotLab Calendar</title>
-  </head>
+  <link rel="stylesheet" href="./source/css/style.css" />
+  <link rel="stylesheet" href="./source/css/calendar.css" />
+  <link rel="stylesheet" href="./source/css/modal.css" />
+  <link rel="stylesheet" href="./source/css/toast.css" />
+  <link rel="stylesheet" href="./source/css/form.css" />
+  <link rel="stylesheet" href="./source/css/queries.css">
+  <title>IotLab Calendar</title>
+</head>
 
-  <body>
-    <div class="branch-container">
-      <div class="register form">
-        <form class="register-form">
-          <div class="form__header text-center mt-4 text">
-            <h2>Đăng kí</h2>
-            <span class="">Chào mừng đến với IotLab Calendar</span>
+<body>
+  <div class="branch-container">  </div>
+  <header>
+    <div class="row">
+      <div class="col b-flex align-items-center">
+        <div class="item-margin-lr-10 slide-bar ">
+          <i class="fa-solid fa-bars text-size-md cursor-pointer"></i>
+        </div>
+        <div class="logo b-flex align-items-center cursor-default ">
+          <img class="item-margin-lr-30-10 img-fluid rounded-circle logo-img" src="./source/img/logo.png" alt="logo">
+          <span class="h5">IOTLAB CALENDAR</span>
+        </div>
+      </div>
+      <div class="col  b-flex align-items-center center-header ">
+        <div>
+          <button class="btn btn-outline-primary btn-today">Hôm nay</button>
+        </div>
+
+        <div class="item-margin-lr-50-10 text-size-md-sm-500 text-color-black">
+          <span class="header__date" id="header__date"></span>
+        </div>
+      </div>
+      <div class="col  b-flex align-items-center  justify-content-around ">
+        <div class="view position-relative">
+          <button class="size-100 btn btn-outline-primary btn-view ">
+            <span>Ngày</span>
+            <i class="item-margin-l-10 fa-solid fa-caret-down"></i>
+          </button>
+          <div class="popup-container position-absolute d-none">
+            <div class="popup-main">
+              <ul>
+                <li class="view-list viewing" id="ngayView">Ngày</li>
+                <li class="view-list" id="tuanView">Tuần</li>
+                <li class="view-list" id="thangView">Tháng</li>
+                <li class="view-list" id="namView">Năm</li>
+              </ul>
+
+            </div>
           </div>
-          <!-- progressbar -->
-          <ul id="progressbar">
-            <li class="active-li">Thông tin tài khoản</li>
-            <li id="progress2">Cài đặt và đăng kí</li>
-          </ul>
-          <!-- formfield -->
-          <fieldset class="field-1 d-flex">
-            <div class="group">
-              <input
-                type="email"
-                pattern="[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,4}$"
-                maxlength="140"
-                required
-                spellcheck="false"
-              />
-              <label>Email</label>
-            </div>
-            <div class="group">
-              <input type="password" required />
-              <label>Mật khẩu</label>
-            </div>
-            <div class="row-custom">
-              <div class="col-7 flex-start">
-                <div class="group">
-                  <input type="text" id="name" required spellcheck="false" />
-                  <label>Họ và tên</label>
-                </div>
-              </div>
-              <div class="col-5 flex-end">
-                <div class="group">
-                  <input type="text" id="idgv" required spellcheck="false" />
-                  <label>Mã giáo viên</label>
-                </div>
-              </div>
-            </div>
-            <button type="text" class="nextForm action-button btn btn-primary btn-custom-1">
-              Next
-            </button>
-          </fieldset>
-
-          <fieldset class="field-2">
-            <div class="mb-3 w-80">
-              <label for="formFileSm" class="form-label">Ảnh đại diên</label>
-              <input
-                class="form-control form-control"
-                id="formFileSm"
-                type="file"
-              />
-            </div>
-            <div class="color-user w-80">
-              <div onclick="setColorForm()" class="btn btn-secondary btn-random">
-                Click To Random or Picker Below 
-              </div>
-              <input
-                type="color"
-                class="form-control form-control-color"
-                id="colorInput"
-                value="#FFFFFF"
-                title="Choose your color"
-              />
-              <span class="messColor">!Không nên chọn màu trắng hoặc gần trắng hoặc đen hoặc gần đen</span>
-            </div>
-            <div class="form-check w-80">
-              <input
-                class="form-check-input"
-                type="checkbox"
-                value=""
-                id="flexCheckDefault"
-              />
-              <label class="form-check-label"  for="flexCheckDefault">
-                Default checkbox
-              </label>
-            </div>
-            <div class="container-btn">
-                <button class="prevForm action-button btn btn-primary btn-custom-1">Prev</button>
-                <input
-                  type="submit"
-                  value="Đăng kí"
-                  class="btn btn-primary btn-submit"
-                />
-            </div>
-          </fieldset>
-        </form>
+        </div>
+       
+        <div class="account item-margin-l-50  cursor-pointer text-size-md-sm-500 text-color-black ">
+          <span  class="account-name btn btn-outline-primary btn-view ">Đăng nhập</span>
+        </div>
       </div>
     </div>
-    <!-- <header>
-        <div class="row">
-            <div class="col d-flex align-items-center">
-                <div class="item-margin-lr-10 slide-bar ">
-                    <i class="fa-solid fa-bars text-size-md cursor-pointer"></i>
-                </div>
-                <div class="logo d-flex align-items-center cursor-default">
-                    <img class="item-margin-lr-30-10 img-fluid rounded-circle logo-img" src="./source/img/logo.png"
-                        alt="logo">
-                    <span class="h5">IOTLAB CALENDAR</span>
-                </div>
-            </div>
-            <div class="col  d-flex align-items-center ">
-                <div>
-                    <button class="btn btn-outline-primary btn-today">Hôm nay</button>
-                </div>
-                
-                <div class="item-margin-lr-50-10 text-size-md-sm-500 text-color-black">
-                    <span class="header__date" id="header__date"></span>
-                </div>
-            </div>
-            <div class="col d-flex align-items-center justify-content-end ">
-                <div class="view position-relative">
-                    <button class="size-100 btn btn-outline-primary btn-view ">
-                        <span>Ngày</span>
-                        <i class="item-margin-l-10 fa-solid fa-caret-down"></i>
-                    </button>
-                    <div class="popup-container position-absolute d-none">
-                        <div class="popup-main">
-                            <ul>
-                                <li class="view-list viewing" id="ngayView">Ngày</li>
-                                <li class="view-list"  id="tuanView" >Tuần</li>
-                                <li class="view-list" id="thangView">Tháng</li>
-                                <li class="view-list" id="namView">Năm</li>
-                            </ul>
-
-                        </div>
-                    </div>
-                </div>
-                <div class="setting item-margin-l-30 cursor-pointer">
-                    <svg width="28" height="28" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                        <path
-                            d="M12 15C13.6569 15 15 13.6569 15 12C15 10.3431 13.6569 9 12 9C10.3431 9 9 10.3431 9 12C9 13.6569 10.3431 15 12 15Z"
-                            stroke="#292D32" stroke-width="1.5" stroke-miterlimit="10" stroke-linecap="round"
-                            stroke-linejoin="round" />
-                        <path
-                            d="M2 12.8799V11.1199C2 10.0799 2.85 9.21994 3.9 9.21994C5.71 9.21994 6.45 7.93994 5.54 6.36994C5.02 5.46994 5.33 4.29994 6.24 3.77994L7.97 2.78994C8.76 2.31994 9.78 2.59994 10.25 3.38994L10.36 3.57994C11.26 5.14994 12.74 5.14994 13.65 3.57994L13.76 3.38994C14.23 2.59994 15.25 2.31994 16.04 2.78994L17.77 3.77994C18.68 4.29994 18.99 5.46994 18.47 6.36994C17.56 7.93994 18.3 9.21994 20.11 9.21994C21.15 9.21994 22.01 10.0699 22.01 11.1199V12.8799C22.01 13.9199 21.16 14.7799 20.11 14.7799C18.3 14.7799 17.56 16.0599 18.47 17.6299C18.99 18.5399 18.68 19.6999 17.77 20.2199L16.04 21.2099C15.25 21.6799 14.23 21.3999 13.76 20.6099L13.65 20.4199C12.75 18.8499 11.27 18.8499 10.36 20.4199L10.25 20.6099C9.78 21.3999 8.76 21.6799 7.97 21.2099L6.24 20.2199C5.33 19.6999 5.02 18.5299 5.54 17.6299C6.45 16.0599 5.71 14.7799 3.9 14.7799C2.85 14.7799 2 13.9199 2 12.8799Z"
-                            stroke="#292D32" stroke-width="1.5" stroke-miterlimit="10" stroke-linecap="round"
-                            stroke-linejoin="round" />
-                    </svg>
-
-                </div>
-                <div class="item-hover account item-margin-l-50 cursor-pointer text-size-md-sm-500 text-color-black  ">
-                    <span class="account-name">Thắng <i class="item-margin-l-10 fa-solid fa-caret-down"></i></span>
-                </div>
-            </div>
+  </header>
+  <section class="main">
+    <div class="row h-100 item-margin-r-10">
+      <div class=" col-270 slide-bar-content ">
+        <div class="">
+          <button class="btn btn-primary btn-create"><i class="fa-solid fa-calendar-plus"></i> Tạo</button>
         </div>
-    </header>
-    <section class="main">
-        <div class="row h-100 item-margin-r-10">
-            <div class=" col-270 slide-bar-content ">
-                <div class="">
-                    <button class="btn btn-primary btn-create"><i class="fa-solid fa-calendar-plus"></i> Tạo</button>
+        <div class="calendar-month">
+          <div class="cal__main">
+            <div class="cal__container">
+              <div class="calendar__top">
+                <div class="calendar__day">
+                  <div>
+                    <span class="cal__month" id="cal__month"></span>
+                  </div>
+                  <div class=" w-50px d-flex justify-content-between">
+                    <span class="calender-arrow-l ico cursor-pointer">
+                      <i class=" fa-solid fa-angle-left"></i>
+                    </span>
+                    <span class="calender-arrow-r ico cursor-pointer ">
+                      <i class="fa-solid fa-angle-right"></i>
+                    </span>
+                  </div>
                 </div>
-                <div class="calendar-month">
-                    <div class="cal__main">
-                        <div class="cal__container">
-                            <div class="calendar__top">
-                                <div class="calendar__day">
-                                    <div>
-                                        <span class="cal__month" id="cal__month"></span>
-                                    </div>
-                                    <div class=" w-50px d-flex justify-content-between">
-                                        <span class="calender-arrow-l ico cursor-pointer">
-                                            <i class=" fa-solid fa-angle-left"></i>
-                                        </span>
-                                        <span class="calender-arrow-r ico cursor-pointer ">
-                                            <i class="fa-solid fa-angle-right"></i>
-                                        </span>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="calendar__bottom">
-                                <div class="cal__weekdays" id="cal__weekdays">
-                                    <span>Cn</span>
-                                    <span>T2</span>
-                                    <span>T3</span>
-                                    <span>T4</span>
-                                    <span>T5</span>
-                                    <span>T6</span>
-                                    <span>T7</span>
-                                </div>
-                                <div class="cal__days" id="cal__days"></div>
-                            </div>
-                        </div>
-                    </div>
+              </div>
+              <div class="calendar__bottom">
+                <div class="cal__weekdays" id="cal__weekdays">
+                  <span>Cn</span>
+                  <span>T2</span>
+                  <span>T3</span>
+                  <span>T4</span>
+                  <span>T5</span>
+                  <span>T6</span>
+                  <span>T7</span>
+                </div>
+                <div class="cal__days" id="cal__days"></div>
+              </div>
+            </div>
+          </div>
 
-                </div>
-            </div>
-            <div class="col calendar-table ">
-                
-                
-            </div>
         </div>
+      </div>
+      <div class="col calendar-table ">
 
-    </section> -->
 
-    <!-- -----------------------------------------------modal--------------------------------------------- -->
-    <!-- <div id="toast"></div>
+      </div>
+    </div>
 
-    <div>
-    <div class="modal create-event">
-        <div class="modal-header">
-            <span class="exit cursor-pointer"><i class="fa-solid fa-xmark"></i></span>
+  </section>
+
+  <!-- -----------------------------------------------modal--------------------------------------------- -->
+  <div id="toast"></div>
+
+
+  <div class="modal create-event">
+    <div class="modal-header">
+      <span class="exit cursor-pointer"><i class="fa-solid fa-xmark"></i></span>
+    </div>
+    <form class="modal-body " id="createTime">
+      <input type="text" name="title" class="event event-title" id="title-form" placeholder="Tiêu đề">
+      <div class="event event-time w-100 d-flex  align-items-center">
+        <i class="fa-regular fa-clock clock"></i>
+        <div class="time">
+          <div class="op thu-ngay-thang d-inline-block ">
+
+          </div>
+          <div class="thoi-gian d-inline-flex">
+            <div class="op time-start cursor-pointer">
+              --:-- AM
+            </div>
+
+            <span class="minus cursor-default"><i class="fa-solid fa-minus"></i></span>
+            <div class="op time-end cursor-pointer">
+              --:-- AM
+            </div>
+            <div class="timing-table">
+              <ul>
+                <li>1:00 AM</li>
+                <li>2:00 AM</li>
+                <li>3:00 AM</li>
+                <li>4:00 AM</li>
+                <li>5:00 AM</li>
+                <li>6:00 AM</li>
+                <li>7:00 AM</li>
+                <li>8:00 AM</li>
+                <li>9:00 AM</li>
+                <li>10:00 AM</li>
+                <li>11:00 AM</li>
+                <li>12:00 AM</li>
+                <li>1:00 PM</li>
+                <li>2:00 PM</li>
+                <li>3:00 PM</li>
+                <li>4:00 PM</li>
+                <li>5:00 PM</li>
+                <li>6:00 PM</li>
+                <li>7:00 PM</li>
+                <li>8:00 PM</li>
+                <li>9:00 PM</li>
+                <li>10:00 PM</li>
+                <li>11:00 PM</li>
+                <li>12:00 PM</li>
+              </ul>
+            </div>
+          </div>
         </div>
-        <form class="modal-body " id="createTime">
-            <input type="text" name="title" class="event event-title" id="title-form" placeholder="Tiêu đề">
-            <div class="event event-time w-100 d-flex  align-items-center">
-                <i class="fa-regular fa-clock clock"></i>
-                <div class="time">
-                    <div class="op thu-ngay-thang d-inline-block ">
-                       
-                    </div>
-                    <div class="thoi-gian d-inline-flex">
-                        <div class="op time-start cursor-pointer">
-                            --:-- AM
-                        </div>
-                        
-                        <span class="minus cursor-default"><i class="fa-solid fa-minus"></i></span>
-                        <div class="op time-end cursor-pointer">
-                            --:-- AM
-                        </div>
-                        <div class="timing-table">
-                            <ul>
-                                <li>1:00 AM</li>
-                                <li>2:00 AM</li>
-                                <li>3:00 AM</li>
-                                <li>4:00 AM</li>
-                                <li>5:00 AM</li>
-                                <li>6:00 AM</li>
-                                <li>7:00 AM</li>
-                                <li>8:00 AM</li>
-                                <li>9:00 AM</li>
-                                <li>10:00 AM</li>
-                                <li>11:00 AM</li>
-                                <li>12:00 AM</li>
-                                <li>1:00 PM</li>
-                                <li>2:00 PM</li>
-                                <li>3:00 PM</li>
-                                <li>4:00 PM</li>
-                                <li>5:00 PM</li>
-                                <li>6:00 PM</li>
-                                <li>7:00 PM</li>
-                                <li>8:00 PM</li>
-                                <li>9:00 PM</li>
-                                <li>10:00 PM</li>
-                                <li>11:00 PM</li>
-                                <li>12:00 PM</li>
-                            </ul>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            <div class=" event descripion">
-                <textarea name="description" id="description-form" rows="5" cols="40" placeholder="Mô tả"  spellcheck="false"></textarea>
-            </div>
-            <input type="submit" class="btn btn-primary btn-save" value="Lưu">
-        </form>
-    </div> -->
+      </div>
+      <div class=" event descripion">
+        <textarea name="description" id="description-form" rows="5" cols="40" placeholder="Mô tả"
+          spellcheck="false"></textarea>
+      </div>
+      <input type="submit" class="btn btn-primary btn-save" value="Lưu">
+    </form>
+  </div>
 
-    <script src="./source/js/handleFormField.js"></script>
-    <!-- <script src="./source/js/handleEvent.js"></script> -->
-    <script type="module" src="./source/js/auth.js"></script>
-    <!-- <script type="module" src="./source/js/html.js"></script> -->
-    <script type="module" src="./source/js/formHtml.js"></script>
-    <!-- <script type="module" src="./source/js/App.js"></script>
-    <script type="module" src="./source/js/calendar.js"></script>
-    <script type="module" src="./source/js/toastMes.js"></script> -->
-  </body>
+
+  <script type="module" src="./source/js/html.js"></script>
+  <script type="module" src="./source/js/formHtml.js"></script>
+  <script src="./source/js/handleEvent.js"></script>
+  <script type="module" src="./source/js/App.js"></script>
+  <script type="module" src="./source/js/calendar.js"></script>
+  <script type="module" src="./source/js/toastMes.js"></script>
+</body>
+
 </html>

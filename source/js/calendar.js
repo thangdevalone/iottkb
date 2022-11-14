@@ -6,9 +6,10 @@ const btnToday = document.querySelector('.btn-today');
 const calTable = document.querySelector(".calendar-table")
 const btnView = document.querySelector(".btn-view");
 const allDates = document.querySelector('.cal__days');
-
+const modal = document.querySelector('.modal');
 const calMonth = document.querySelector('#cal__month');
 const headerDate = document.querySelector('#header__date');
+
 
 const nowMonth = date.getMonth();
 const nowYear = date.getFullYear();
@@ -17,11 +18,7 @@ import htmls from "./html.js"
 // calTable.innerHTML=htmls.day
 
 
-function renderDayTop(d, m, y) {
-	day.innerHTML = d
-	month.innerHTML = m
-	year.innerHTML = year
-}
+
 
 var mappingMonth = []
 
@@ -129,7 +126,7 @@ btnToday.addEventListener('click', () => {
 	//animation
 	
 })
-cal_days.addEventListener('click', function (e) {
+allDates.addEventListener('click', function (e) {
 	if(e.target.classList.contains('daysInMonth')){
 		display();
 		whereAmI();
