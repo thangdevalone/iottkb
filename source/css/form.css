@@ -12,8 +12,8 @@
 }
 .form{
   position: relative;
-  border-top:10px solid rgb(255, 0, 0) ;
-  border-bottom:10px solid rgb(255, 0, 0);
+  border-top:10px solid white;
+  border-bottom:10px solid white;
   width: 50%;
   background-color: white;
   height: 85%;
@@ -87,14 +87,13 @@
   
   color: black;
   font-size: 15px;
-  padding: 0px 5px 0px 10px;
+  padding: 0px 10px 0px 10px;
   display: block;
   outline: none;
   border: none;
   width: 100%;
   border-radius: 5px;
   height: 50px;
-  padding: 0 10px;
   border: 1px solid #b2bac4;
 }
 .group label{
@@ -419,5 +418,11 @@ fieldset{
 }
 .nextForm{
   margin-top: 30px;
-
+}
+.eye{
+  position: absolute;
+  top:50%;
+  transform: translateY(-50%);
+  right: 10px;
+  cursor: pointer;
 }

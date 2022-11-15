@@ -5,9 +5,9 @@ import form from "./formHtml.js";
 import { initializeApp } from "https://www.gstatic.com/firebasejs/9.13.0/firebase-app.js";
 import {
     getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, GoogleAuthProvider,
-    updateProfile, updateEmail
+    updateProfile, updateEmail, setPersistence, browserSessionPersistence
 } from "https://www.gstatic.com/firebasejs/9.13.0/firebase-auth.js";
-import { getFirestore, collection, doc, setDoc, addDoc, getDocs,onSnapshot } from "https://www.gstatic.com/firebasejs/9.13.0/firebase-firestore.js";
+import { getFirestore, collection, doc, setDoc, addDoc, getDocs, onSnapshot } from "https://www.gstatic.com/firebasejs/9.13.0/firebase-firestore.js";
 import { getStorage, ref, uploadBytesResumable, getDownloadURL } from "https://www.gstatic.com/firebasejs/9.13.0/firebase-storage.js";
 
 // TODO: Add SDKs for Firebase products that you want to use
@@ -69,9 +69,9 @@ const cal_days = document.querySelector('.cal__days')
 const btnView = document.querySelector('.btn-view');
 let dataDate = [];
 let colorUser;
-let nowYear=date.getFullYear();
+let nowYear = date.getFullYear();
 let signIn = false;
-let formInforCurrentUser={};
+let formInforCurrentUser = {};
 
 const timeStart = document.querySelector('.time-start');
 const timeEnd = document.querySelector('.time-end');
@@ -90,13 +90,101 @@ const auth = getAuth(app);
 const db = getFirestore(app)
 const storage = getStorage();
 
+
+setPersistence(auth, browserSessionPersistence)
+    .then(() => {
+        // Existing and future Auth states are now persisted in the current
+        // session only. Closing the window would clear any existing state even
+        // if a user forgets to sign out.
+        // ...
+        const user=auth.currentUser
+        if(user){
+            formInforCurrentUser = user;
+            async function GetAllUser() {
+                usersInApp = []
+                const querrySnapshot = await getDocs(collection(db, "users"));
+    
+                querrySnapshot.forEach(doc => {
+                    usersInApp.push(doc.data());
+                })
+                handleUserCurrent(usersInApp, user.uid)
+            }
+            // get all dataa user
+            GetAllUser()
+            // New sign-in will be persisted with session persistence.
+            signIn = true;
+    
+            const html = `
+            <img style="width: 50px;
+                        height: 50px;
+                        border-radius: 50%;
+                        border:2px solid black;" 
+                src="${user.photoURL}" atl="avt"/>
+            <div id='accout-infor'>
+                <div class='userInfor'>
+                    <img style="width: 100px;
+                                height: 100px;
+                                border-radius: 50%;
+                                border:2px solid black;" 
+                        src="${user.photoURL}" atl="avt"/>
+                    <div style="margin:10px;0;font-weight:bold;font-size:20px">${user.displayName}</div>
+                    <div style="font-size:16px; font-weight:400px;color:var(--color-text-default)">${user.email}</div>
+                </div>
+                <div style='width:350px;height:1px;background-color:var(--color-text-default)'></div>
+                <div style="width:100%">
+                    <ul>
+                        <li class="pd-10 cursor-pointer feature feature-flex" id="logUserInfor">
+                        <div>Thông tin tài khoản</div><div><svg width="18" height="18" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M17 21H7C3 21 2 20 2 16V8C2 4 3 3 7 3H17C21 3 22 4 22 8V16C22 20 21 21 17 21Z" stroke="#292D32" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                        <path d="M14 8H19" stroke="#292D32" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                        <path d="M15 12H19" stroke="#292D32" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                        <path d="M17 16H19" stroke="#292D32" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                        <path d="M8.49994 11.2899C9.49958 11.2899 10.3099 10.4796 10.3099 9.47992C10.3099 8.48029 9.49958 7.66992 8.49994 7.66992C7.50031 7.66992 6.68994 8.48029 6.68994 9.47992C6.68994 10.4796 7.50031 11.2899 8.49994 11.2899Z" stroke="#292D32" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                        <path d="M12 16.33C11.86 14.88 10.71 13.74 9.26 13.61C8.76 13.56 8.25 13.56 7.74 13.61C6.29 13.75 5.14 14.88 5 16.33" stroke="#292D32" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                        </svg>
+                        </div>
+                        </li>
+                        <li class="pd-10 cursor-pointer feature feature-flex" id="logDataWareHouse">
+                        <div>Kho dữ liệu</div><div><svg width="18" height="18" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M9.02 2.83992L3.63 7.03992C2.73 7.73992 2 9.22992 2 10.3599V17.7699C2 20.0899 3.89 21.9899 6.21 21.9899H17.79C20.11 21.9899 22 20.0899 22 17.7799V10.4999C22 9.28992 21.19 7.73992 20.2 7.04992L14.02 2.71992C12.62 1.73992 10.37 1.78992 9.02 2.83992Z" stroke="#292D32" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                        <path d="M10.5 18H13.5C15.15 18 16.5 16.65 16.5 15V12C16.5 10.35 15.15 9 13.5 9H10.5C8.85 9 7.5 10.35 7.5 12V15C7.5 16.65 8.85 18 10.5 18Z" stroke="#292D32" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                        <path d="M12 9V18" stroke="#292D32" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                        <path d="M7.5 13.5H16.5" stroke="#292D32" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                        </svg>
+                        </div>
+                        </li>
+                        <li class="pd-10 cursor-pointer feature feature-flex" id="logDataAnalystics">
+                        <div>Phân tích dữ liệu</div><div><svg width="18" height="18" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M2 2V19C2 20.66 3.34 22 5 22H22" stroke="#292D32" stroke-width="1.5" stroke-miterlimit="10" stroke-linecap="round" stroke-linejoin="round"/>
+                        <path d="M5 17L9.59 11.64C10.35 10.76 11.7 10.7 12.52 11.53L13.47 12.48C14.29 13.3 15.64 13.25 16.4 12.37L21 7" stroke="#292D32" stroke-width="1.5" stroke-miterlimit="10" stroke-linecap="round" stroke-linejoin="round"/>
+                        </svg>
+                        </div>
+                        </li>
+                    </ul>
+                </div>
+                
+                <button class='btn btn-outline-primary btn-signOut' style="width:80%;height:50px;font-size:18px;">Đăng xuất tài khoản</button>  
+            </div>
+            `
+            accountSignIn.innerHTML = html
+            signOut()
+    
+        }
+        
+    })
+    .catch((error) => {
+        // Handle Errors here.
+        const errorCode = error.code;
+        const errorMessage = error.message;
+    });
+
 let usersInApp = []
 
 
 // update DateDate
 GetYearDate()
 async function GetYearDate() {
-    dataDate=[]
+    dataDate = []
     const querrySnapshot = await getDocs(collection(db, `${date.getFullYear()}`));
     querrySnapshot.forEach(doc => {
         dataDate.push(doc.data());
@@ -107,12 +195,11 @@ async function GetYearDate() {
 }
 
 
-const accountName = document.querySelector(".account")
+const accountSignIn = document.querySelector(".account")
 const containerForm = document.querySelector(".branch-container");
-containerForm.style.display = "none";
 
 
-accountName.addEventListener('click', () => {
+accountSignIn.addEventListener('click', () => {
     if (signIn === false) {
         containerForm.style.display = "flex";
         loginForm()
@@ -131,7 +218,7 @@ function handleUserCurrent(userMap, currentUserID) {
     const userCurrentIndex = userMap.findIndex(x => x.userID === currentUserID);
     const colorUserCurrent = userMap[userCurrentIndex].color
     document.querySelector(':root').style.setProperty('--color-user', `${colorUserCurrent}`);
-    colorUser=colorUserCurrent
+    colorUser = colorUserCurrent
 }
 
 //login------------------------------------------
@@ -141,7 +228,38 @@ function loginForm() {
     document.querySelector(".span-dk").onclick = () => registerForm();
     const loginForm = document.querySelector("#login");
     const input = document.querySelectorAll(".group input");
-    const exitForm = document.querySelector('.exit-form')
+    const exitForm = document.querySelector('.exit-form');
+    const eye=document.querySelector('#passEyeLogin')
+
+    eye.addEventListener('click', ()=>{
+        if(eye.classList.contains('show')){
+            loginForm.querySelector('#passLogin').type="password";
+            eye.classList.remove('show');
+            eye.innerHTML=`
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M14.53 9.47004L9.47004 14.53C8.82004 13.88 8.42004 12.99 8.42004 12C8.42004 10.02 10.02 8.42004 12 8.42004C12.99 8.42004 13.88 8.82004 14.53 9.47004Z" stroke="#292D32" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+            <path d="M17.82 5.76998C16.07 4.44998 14.07 3.72998 12 3.72998C8.46997 3.72998 5.17997 5.80998 2.88997 9.40998C1.98997 10.82 1.98997 13.19 2.88997 14.6C3.67997 15.84 4.59997 16.91 5.59997 17.77" stroke="#292D32" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+            <path d="M8.42004 19.5301C9.56004 20.0101 10.77 20.2701 12 20.2701C15.53 20.2701 18.82 18.1901 21.11 14.5901C22.01 13.1801 22.01 10.8101 21.11 9.40005C20.78 8.88005 20.42 8.39005 20.05 7.93005" stroke="#292D32" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+            <path d="M15.5099 12.7C15.2499 14.11 14.0999 15.26 12.6899 15.52" stroke="#292D32" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+            <path d="M9.47 14.53L2 22" stroke="#292D32" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+            <path d="M22 2L14.53 9.47" stroke="#292D32" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+            
+            `
+        }
+        else{
+            loginForm.querySelector('#passLogin').type="text";
+            eye.classList.add('show');
+            eye.innerHTML=`
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M15.58 12C15.58 13.98 13.98 15.58 12 15.58C10.02 15.58 8.42004 13.98 8.42004 12C8.42004 10.02 10.02 8.42004 12 8.42004C13.98 8.42004 15.58 10.02 15.58 12Z" stroke="#292D32" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+            <path d="M12 20.27C15.53 20.27 18.82 18.19 21.11 14.59C22.01 13.18 22.01 10.81 21.11 9.39997C18.82 5.79997 15.53 3.71997 12 3.71997C8.46997 3.71997 5.17997 5.79997 2.88997 9.39997C1.98997 10.81 1.98997 13.18 2.88997 14.59C5.17997 18.19 8.46997 20.27 12 20.27Z" stroke="#292D32" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>            
+
+            `
+        }
+    })
+
     exitForm.onclick = () => {
         containerForm.style.display = "none"
     }
@@ -164,7 +282,7 @@ function loginForm() {
         signInWithEmailAndPassword(auth, email, password)
             .then((userCredential) => {
                 const user = userCredential.user;
-                formInforCurrentUser=user;
+                formInforCurrentUser = user;
                 async function GetAllUser() {
                     usersInApp = []
                     const querrySnapshot = await getDocs(collection(db, "users"));
@@ -177,15 +295,64 @@ function loginForm() {
                 // get all dataa user
                 GetAllUser()
                 // Signed in 
-                signIn = true;
+
                 success("Bạn đã đăng nhập tài khoản thành công.")
+                signIn = true;
 
                 const html = `
-          <img style="width: 50px;
-          height: 50px;
-          border-radius: 50%;border:2px solid black;" src="${user.photoURL}" atl="avt"/>
+        <img style="width: 50px;
+                    height: 50px;
+                    border-radius: 50%;
+                    border:2px solid black;" 
+            src="${user.photoURL}" atl="avt"/>
+        <div id='accout-infor'>
+            <div class='userInfor'>
+                <img style="width: 100px;
+                            height: 100px;
+                            border-radius: 50%;
+                            border:2px solid black;" 
+                    src="${user.photoURL}" atl="avt"/>
+                <div style="margin:10px;0;font-weight:bold;font-size:20px">${user.displayName}</div>
+                <div style="font-size:16px; font-weight:400px;color:var(--color-text-default)">${user.email}</div>
+            </div>
+            <div style='width:350px;height:1px;background-color:var(--color-text-default)'></div>
+            <div style="width:100%">
+                <ul>
+                    <li class="pd-10 cursor-pointer feature feature-flex" id="logUserInfor">
+                    <div>Thông tin tài khoản</div><div><svg width="18" height="18" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M17 21H7C3 21 2 20 2 16V8C2 4 3 3 7 3H17C21 3 22 4 22 8V16C22 20 21 21 17 21Z" stroke="#292D32" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                    <path d="M14 8H19" stroke="#292D32" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                    <path d="M15 12H19" stroke="#292D32" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                    <path d="M17 16H19" stroke="#292D32" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                    <path d="M8.49994 11.2899C9.49958 11.2899 10.3099 10.4796 10.3099 9.47992C10.3099 8.48029 9.49958 7.66992 8.49994 7.66992C7.50031 7.66992 6.68994 8.48029 6.68994 9.47992C6.68994 10.4796 7.50031 11.2899 8.49994 11.2899Z" stroke="#292D32" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                    <path d="M12 16.33C11.86 14.88 10.71 13.74 9.26 13.61C8.76 13.56 8.25 13.56 7.74 13.61C6.29 13.75 5.14 14.88 5 16.33" stroke="#292D32" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                    </svg>
+                    </div>
+                    </li>
+                    <li class="pd-10 cursor-pointer feature feature-flex" id="logDataWareHouse">
+                    <div>Kho dữ liệu</div><div><svg width="18" height="18" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M9.02 2.83992L3.63 7.03992C2.73 7.73992 2 9.22992 2 10.3599V17.7699C2 20.0899 3.89 21.9899 6.21 21.9899H17.79C20.11 21.9899 22 20.0899 22 17.7799V10.4999C22 9.28992 21.19 7.73992 20.2 7.04992L14.02 2.71992C12.62 1.73992 10.37 1.78992 9.02 2.83992Z" stroke="#292D32" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                    <path d="M10.5 18H13.5C15.15 18 16.5 16.65 16.5 15V12C16.5 10.35 15.15 9 13.5 9H10.5C8.85 9 7.5 10.35 7.5 12V15C7.5 16.65 8.85 18 10.5 18Z" stroke="#292D32" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                    <path d="M12 9V18" stroke="#292D32" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                    <path d="M7.5 13.5H16.5" stroke="#292D32" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                    </svg>
+                    </div>
+                    </li>
+                    <li class="pd-10 cursor-pointer feature feature-flex" id="logDataAnalystics">
+                    <div>Phân tích dữ liệu</div><div><svg width="18" height="18" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M2 2V19C2 20.66 3.34 22 5 22H22" stroke="#292D32" stroke-width="1.5" stroke-miterlimit="10" stroke-linecap="round" stroke-linejoin="round"/>
+                    <path d="M5 17L9.59 11.64C10.35 10.76 11.7 10.7 12.52 11.53L13.47 12.48C14.29 13.3 15.64 13.25 16.4 12.37L21 7" stroke="#292D32" stroke-width="1.5" stroke-miterlimit="10" stroke-linecap="round" stroke-linejoin="round"/>
+                    </svg>
+                    </div>
+                    </li>
+                </ul>
+            </div>
+            
+            <button class='btn btn-outline-primary btn-signOut' style="width:80%;height:50px;font-size:18px;">Đăng xuất tài khoản</button>  
+        </div>
         `
-                accountName.innerHTML = html
+                accountSignIn.innerHTML = html
+                signOut()
                 setTimeout(() => {
                     containerForm.style.display = "none"
                 }, 1000)
@@ -216,6 +383,35 @@ function registerForm() {
     const submitForm = document.querySelector('#btnSubRes');
     const input = document.querySelectorAll(".group input");
     const exitForm = document.querySelector('.exit-form');
+    const eye=document.querySelector('#passEyeRegister')
+
+    eye.addEventListener('click', ()=>{
+        if(eye.classList.contains('show')){
+            loginForm.querySelector('#passRegister').type="password";
+            eye.classList.remove('show');
+            eye.innerHTML=`
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M14.53 9.47004L9.47004 14.53C8.82004 13.88 8.42004 12.99 8.42004 12C8.42004 10.02 10.02 8.42004 12 8.42004C12.99 8.42004 13.88 8.82004 14.53 9.47004Z" stroke="#292D32" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+            <path d="M17.82 5.76998C16.07 4.44998 14.07 3.72998 12 3.72998C8.46997 3.72998 5.17997 5.80998 2.88997 9.40998C1.98997 10.82 1.98997 13.19 2.88997 14.6C3.67997 15.84 4.59997 16.91 5.59997 17.77" stroke="#292D32" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+            <path d="M8.42004 19.5301C9.56004 20.0101 10.77 20.2701 12 20.2701C15.53 20.2701 18.82 18.1901 21.11 14.5901C22.01 13.1801 22.01 10.8101 21.11 9.40005C20.78 8.88005 20.42 8.39005 20.05 7.93005" stroke="#292D32" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+            <path d="M15.5099 12.7C15.2499 14.11 14.0999 15.26 12.6899 15.52" stroke="#292D32" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+            <path d="M9.47 14.53L2 22" stroke="#292D32" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+            <path d="M22 2L14.53 9.47" stroke="#292D32" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+            `
+        }
+        else{
+            loginForm.querySelector('#passRegister').type="text";
+            eye.classList.add('show');
+            eye.innerHTML=`
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M15.58 12C15.58 13.98 13.98 15.58 12 15.58C10.02 15.58 8.42004 13.98 8.42004 12C8.42004 10.02 10.02 8.42004 12 8.42004C13.98 8.42004 15.58 10.02 15.58 12Z" stroke="#292D32" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+            <path d="M12 20.27C15.53 20.27 18.82 18.19 21.11 14.59C22.01 13.18 22.01 10.81 21.11 9.39997C18.82 5.79997 15.53 3.71997 12 3.71997C8.46997 3.71997 5.17997 5.79997 2.88997 9.39997C1.98997 10.81 1.98997 13.18 2.88997 14.59C5.17997 18.19 8.46997 20.27 12 20.27Z" stroke="#292D32" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>            
+
+            `
+        }
+    })
     sourceBtn.onclick = (e) => {
         e.stopPropagation();
 
@@ -322,7 +518,6 @@ function registerForm() {
             formField[0].classList.add("trans-r-active");
 
     })
-
     const setColorForm = () => {
         const randomColor = Math.floor(Math.random() * 16777215).toString(16);
         const maMau = "#" + randomColor;
@@ -330,6 +525,7 @@ function registerForm() {
         document.querySelector(".form").style.borderTop = `10px solid ${colorInput.value}`;
         document.querySelector(".form").style.borderBottom = `10px solid ${colorInput.value}`;
     }
+    setColorForm()
     document.querySelector(".btn-random").onclick = () => setColorForm();
     colorInput.addEventListener('input', () => {
         document.querySelector(".form").style.borderTop = `10px solid ${colorInput.value}`;
@@ -471,6 +667,45 @@ function registerForm() {
     })
 }
 
+//sign out
+
+function signOut(){
+    const account= document.querySelector('.account img');
+    const accoutInfor=document.querySelector('#accout-infor');
+    const btnSignOut=document.querySelector('.btn-signOut');
+    // đăng xuất
+    btnSignOut.addEventListener('click', () =>{
+        auth.signOut().then(()=>{
+            success('Đăng xuất thành công');
+            signIn=false;
+            accountSignIn.innerHTML=`<span  class="account-name btn btn-outline-primary btn-signIn ">Đăng nhập</span>`
+        })
+        .catch(()=>{
+            fail('Đăng xuất thất bại! Thử lại sau')
+        })
+    });
+    account.addEventListener('click' ,(e) =>{
+        e.stopPropagation();
+        if(!accoutInfor.classList.contains('d-flex')){
+            accoutInfor.classList.add('d-flex');
+            accoutInfor.style.alignItems="center";
+            accoutInfor.style.flexDirection="column";
+            accoutInfor.style.justifyContent="space-between";
+        }
+        else{
+            accoutInfor.classList.remove('d-flex');
+        }
+    })
+    accoutInfor.addEventListener('click', (e) =>{
+        e.stopPropagation();
+        
+    })
+    document.addEventListener('click' ,() =>{
+        if(accoutInfor.classList.contains('d-flex')){
+            accoutInfor.classList.remove('d-flex');
+        }
+    })
+}
 
 //--------------------------------------------------------------------------------
 //------------------------------------------------------------------------------
@@ -548,7 +783,7 @@ function renderRegister() {
                 timeEnd: timeEndText,
                 lengthDiv: length * height - 5 + 'px',
                 pos: (start - 1) * height + 'px',
-                color:colorUser
+                color: colorUser
             }
 
             const dayCheck = cal_days.querySelector(".active");
@@ -603,7 +838,7 @@ function renderRegister() {
 
 // lắng nghe  thay đổi database
 const unsubscribe = onSnapshot(collection(db, `${date.getFullYear()}`), (snapshot) => {
-   GetYearDate()
+    GetYearDate()
 });
 
 function pushDay(data, registerTime) {
@@ -615,16 +850,16 @@ function pushDay(data, registerTime) {
     })
     let find = false;
 
-    async function addDocument(data,idx) {
+    async function addDocument(data, idx) {
         try {
-            await setDoc(doc(db, `${date.getFullYear()}`,`${data.date}-${data.id_month}-${date.getFullYear()}`), data);
-            if(idx===2){
+            await setDoc(doc(db, `${date.getFullYear()}`, `${data.date}-${data.id_month}-${date.getFullYear()}`), data);
+            if (idx === 2) {
                 dataDate.push(data);
             }
             success();
-            
+
             preLoad()
-        } 
+        }
         catch (e) {
             console.log(e)
             fail("Data not updated!")
@@ -638,18 +873,18 @@ function pushDay(data, registerTime) {
                 find = true;
                 dataDate[i].data.push(data);
                 dataDate[i].registerTime = registerTime;
-                dataDate[i].authors.findIndex(x=>x.author===data.author)===-1?dataDate[i].authors.push({
-                    author:data.author,
-                    color:data.color
-                }):()=>{return false;}
-                addDocument(dataDate[i],1)
+                dataDate[i].authors.findIndex(x => x.author === data.author) === -1 ? dataDate[i].authors.push({
+                    author: data.author,
+                    color: data.color
+                }) : () => { return false; }
+                addDocument(dataDate[i], 1)
                 break;
             }
         }
     }
     if (!find) {
-        
-   
+
+
         const dataDay = {
             id_month: date.getMonth() + 1,
             date: day,
@@ -658,16 +893,16 @@ function pushDay(data, registerTime) {
 
             ],
             registerTime: registerTime,
-            authors:[]
+            authors: []
         }
         dataDay.data.push(data);
         // ngày hôm đó chưa có thì add thêm author vào ngày đó rồi ko cần thêm nữa
         dataDay.authors.push({
-                author:data.author,
-                color:data.color
+            author: data.author,
+            color: data.color
 
-            })
-        addDocument(dataDay,2)
+        })
+        addDocument(dataDay, 2)
     }
 
 }
@@ -706,7 +941,7 @@ function preLoad() {
         const findIndex = month_day.map(dayDom => dataDate.findIndex(x => (x.id_month == date.getMonth() + 1 && x.date == (dayDom.querySelector('.dayInNowMonth')).innerHTML)))
         findIndex.forEach((item, index) => {
             if (item !== -1) {
-                colorRequests[index].innerHTML="";
+                colorRequests[index].innerHTML = "";
                 const arrayAuthors = dataDate[item].authors;
                 const percent = `${100 / arrayAuthors.length}`;
 
@@ -753,35 +988,35 @@ function renderPopupTime(data, index = -1, array = []) {
 }
 prevBtn.onclick = () => {
     animTab(where);
-    if(date.getFullYear()===nowYear){
+    if (date.getFullYear() === nowYear) {
         preLoad()
     }
-    else{
+    else {
         GetYearDate();
-        nowYear==date.getFullYear();
+        nowYear = date.getFullYear();
     }
 }
 nxtBtn.onclick = () => {
     animTab(where);
     preLoad()
-    if(date.getFullYear()===nowYear){
+    if (date.getFullYear() === nowYear) {
         preLoad()
     }
-    else{
+    else {
         GetYearDate();
-        nowYear==date.getFullYear();
+        nowYear = date.getFullYear();
 
     }
 
 }
 btnToday.onclick = () => {
     animTab(where);
-    if(date.getFullYear()===nowYear){
+    if (date.getFullYear() === nowYear) {
         preLoad()
     }
-    else{
+    else {
         GetYearDate();
-        nowYear==date.getFullYear();
+        nowYear = date.getFullYear();
 
     }
 
@@ -789,12 +1024,12 @@ btnToday.onclick = () => {
 cal_days.onclick = (e) => {
     if (e.target.classList.contains('daysInMonth')) {
         animTab(where);
-        if(date.getFullYear()===nowYear){
+        if (date.getFullYear() === nowYear) {
             preLoad()
         }
-        else{
+        else {
             GetYearDate();
-            nowYear==date.getFullYear();
+            nowYear = date.getFullYear();
         }
 
     }
@@ -803,12 +1038,12 @@ cal_days.onclick = (e) => {
 btnView.addEventListener('click', () => {
     view.forEach((item) => {
         item.addEventListener('click', () => {
-            if(date.getFullYear()===nowYear){
+            if (date.getFullYear() === nowYear) {
                 preLoad()
             }
-            else{
+            else {
                 GetYearDate();
-                nowYear==date.getFullYear();
+                nowYear = date.getFullYear();
             }
         });
     });

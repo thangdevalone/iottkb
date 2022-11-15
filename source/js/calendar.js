@@ -201,7 +201,6 @@ function handleViewTable(){
 			if (index === 2) {
 
 				calTable.style.Animation='toLeft 0.25s'
-
 				
 			}
 			if (index === 3) {
@@ -210,13 +209,7 @@ function handleViewTable(){
 				if (!slideBarContent.classList.contains('slide-bar-close')) {
 					slideBarBtn.click();
 				}
-				prevBtn.addEventListener('click', () => {
-					renderYear();
-
-				});
-				nxtBtn.addEventListener('click', () => {
-					renderYear();
-				});
+				
 			}
 		})
 	})
@@ -235,7 +228,7 @@ function renderYear() {
 	const fullTable = calTable.querySelector(".fullCalendar-table")
 	for (let i = 1; i <= 12; i++) {
 		fullTable.innerHTML += `
-		<div class="calendar__index">
+		<div class="calendar__index" id="calYear${i}">
 								<div style="text-align:center;font-size:18px;">T${i}</div>
                                 <div class="cal__weekdays" id="cal__weekdays">
                                     <span>Cn</span>
