@@ -76,15 +76,19 @@ glassCalendar()
 
 
 // render display
-function display() {
+function display(today=-1) {
 	const monthIndex = date.getMonth();
 	const yearNow = date.getFullYear();
 	const dayCheck = allDates.querySelector(".active");
 	const day = dayCheck !== null ? dayCheck.innerHTML : date.getDate();
 	calMonth.innerHTML = twelveMonths[monthIndex][0].toUpperCase() + twelveMonths[monthIndex].slice(1);
 	calMonth.innerHTML += `, ${yearNow}`;
-	headerDate.innerHTML = `${day} ${twelveMonths[monthIndex]}, ${yearNow} `
-
+	if(today===-1){
+		headerDate.innerHTML = `${day} ${twelveMonths[monthIndex]}, ${yearNow} `
+	}
+	else{
+		headerDate.innerHTML = `${date.getDate()} ${twelveMonths[monthIndex]}, ${yearNow} `
+	}
 }
 display()
 
@@ -117,6 +121,9 @@ nxtBtn.addEventListener('click', () => {
 btnToday.addEventListener('click', () => {
 	const todayDate = new Date()
 	date.setMonth(todayDate.getMonth());
+	date.setFullYear(todayDate.getFullYear());
+	date.setDate(todayDate.getDate());
+	display(1)
 	mapping(date);
 	glassCalendar();
 	whereAmI();
@@ -243,17 +250,8 @@ function renderYear() {
                             </div>
 		`
 	}
-	fullTable.style.display = "grid";
-	fullTable.style.gridTemplateColumns = "200px 200px 200px";
-	fullTable.style.gridGap = "90px";
-	fullTable.style.justifyContent = "center";
-	fullTable.style.height = "500px";
-	fullTable.style.overflowY = "scroll";
-	fullTable.style.margin = "0 auto";
-	fullTable.style.width = "1000px";
-
 	for (let i = 1; i <= 12; i++) {
-		xDate.setMonth(i);
+		xDate.setMonth(i-1);
 		mapping(xDate);
 		const emptyDates = new Date(xDate.getFullYear(), xDate.getMonth(), 1).getDay();
 		const cal_daysIndex = document.querySelector("#cal__days" + `${i}`)

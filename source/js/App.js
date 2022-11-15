@@ -118,12 +118,14 @@ setPersistence(auth, browserSessionPersistence)
             <img style="width: 50px;
                         height: 50px;
                         border-radius: 50%;
+                        object-fit: cover;
                         border:2px solid black;" 
                 src="${user.photoURL}" atl="avt"/>
             <div id='accout-infor'>
                 <div class='userInfor'>
                     <img style="width: 100px;
                                 height: 100px;
+                                object-fit: cover;
                                 border-radius: 50%;
                                 border:2px solid black;" 
                         src="${user.photoURL}" atl="avt"/>
@@ -302,6 +304,7 @@ function loginForm() {
                 const html = `
         <img style="width: 50px;
                     height: 50px;
+                    object-fit: cover;
                     border-radius: 50%;
                     border:2px solid black;" 
             src="${user.photoURL}" atl="avt"/>
@@ -309,6 +312,7 @@ function loginForm() {
             <div class='userInfor'>
                 <img style="width: 100px;
                             height: 100px;
+                            object-fit: cover;
                             border-radius: 50%;
                             border:2px solid black;" 
                     src="${user.photoURL}" atl="avt"/>
@@ -956,7 +960,11 @@ function preLoad() {
         })
     }
     if (where == 4) {
-
+        for(let i=0; i<dataDate.length;i++){
+            const dayCheck=document.querySelectorAll(`#cal__days${dataDate[i].id_month} .daysInMonth`)[dataDate[i].date-1]
+            console.log(dayCheck,dataDate[i].id_month)
+            dayCheck.style.border="2px solid red";
+        }
     }
 }
 

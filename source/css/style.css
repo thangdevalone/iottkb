@@ -430,6 +430,16 @@ ul {
   margin: 0 !important;
   z-index: -1;
 }
+.fullCalendar-table{
+    display: grid;
+    grid-template-columns: 200px 200px 200px;
+    gap: 90px;
+    justify-content: center;
+    height: 500px;
+    overflow-y: scroll;
+    margin: 0px auto;
+    width: 1000px;
+}
 /* ---------------------custom scrollbar--------------------- */
 /* width */
 .calendar-table-body::-webkit-scrollbar {
