@@ -76,17 +76,17 @@ glassCalendar()
 
 
 // render display
-function display(today=-1) {
+function display(today = -1) {
 	const monthIndex = date.getMonth();
 	const yearNow = date.getFullYear();
 	const dayCheck = allDates.querySelector(".active");
 	const day = dayCheck !== null ? dayCheck.innerHTML : date.getDate();
 	calMonth.innerHTML = twelveMonths[monthIndex][0].toUpperCase() + twelveMonths[monthIndex].slice(1);
 	calMonth.innerHTML += `, ${yearNow}`;
-	if(today===-1){
+	if (today === -1) {
 		headerDate.innerHTML = `${day} ${twelveMonths[monthIndex]}, ${yearNow} `
 	}
-	else{
+	else {
 		headerDate.innerHTML = `${date.getDate()} ${twelveMonths[monthIndex]}, ${yearNow} `
 	}
 }
@@ -100,12 +100,12 @@ prevBtn.addEventListener('click', () => {
 	mapping(date);
 	glassCalendar();
 	handleNP();
-	if(modal.classList.contains('d-block')){
-    	handleCreate();
+	if (modal.classList.contains('d-block')) {
+		handleCreate();
 	}
 	//animation
 
-	
+
 });
 
 nxtBtn.addEventListener('click', () => {
@@ -114,8 +114,8 @@ nxtBtn.addEventListener('click', () => {
 	mapping(date);
 	glassCalendar();
 	handleNP();
-	if(modal.classList.contains('d-block')){
-    	handleCreate();
+	if (modal.classList.contains('d-block')) {
+		handleCreate();
 	}
 });
 btnToday.addEventListener('click', () => {
@@ -127,62 +127,62 @@ btnToday.addEventListener('click', () => {
 	mapping(date);
 	glassCalendar();
 	whereAmI();
-	if(modal.classList.contains('d-block')){
-    	handleCreate();
+	if (modal.classList.contains('d-block')) {
+		handleCreate();
 	}
 	//animation
-	
+
 })
 allDates.addEventListener('click', function (e) {
-	if(e.target.classList.contains('daysInMonth')){
+	if (e.target.classList.contains('daysInMonth')) {
 		display();
 		whereAmI();
-		
-		if(modal.classList.contains('d-block')){
+
+		if (modal.classList.contains('d-block')) {
 			handleCreate();
 		}
 		//animation
-	
-		
+
+
 	}
 })
-btnView.addEventListener('click',()=>{
+btnView.addEventListener('click', () => {
 	const popup = document.querySelector('.popup-container');
 	popup.classList.toggle('d-none');
 	handleViewTable()
 }
 )
-function animTab(where){
-	if(where==1){
+function animTab(where) {
+	if (where == 1) {
 		calTable.innerHTML = htmls.day;
 		handleDay();
-		
+
 	}
-	if(where==2){
+	if (where == 2) {
 		calTable.innerHTML = htmls.week;
 		handleWeek();
-		
+
 	}
-	if(where==3){
+	if (where == 3) {
 		calTable.innerHTML = htmls.month;
 		handleMonth();
-		
+
 	}
-	if(where==4){
+	if (where == 4) {
 		calTable.innerHTML = htmls.year;
 		renderYear();
-		
+
 		// handleYear();
 	}
 	return false;
 }
-function handleViewTable(){
+function handleViewTable() {
 	const view = document.querySelectorAll(".view-list");
 	view.forEach((item, index) => {
-		
+
 		item.addEventListener("click", () => {
 			const popup = document.querySelector('.popup-container');
-			if(!popup.classList.contains('d-none')){
+			if (!popup.classList.contains('d-none')) {
 				popup.classList.add('d-none')
 			};
 			for (let i = 0; i < view.length; i++) {
@@ -190,25 +190,25 @@ function handleViewTable(){
 					view[i].classList.remove('viewing');
 				}
 			}
-			where=index+1;
+			where = index + 1;
 			animTab(where);
 			item.classList.toggle('viewing')
 			btnView.querySelector('span').innerHTML = item.innerHTML;
 
 			if (index === 0) {
-				
-				
+
+
 
 			}
 			if (index === 1) {
-				
-				calTable.style.Animation='toLeft 0.25s  '
+
+				calTable.style.Animation = 'toLeft 0.25s  '
 
 			}
 			if (index === 2) {
 
-				calTable.style.Animation='toLeft 0.25s'
-				
+				calTable.style.Animation = 'toLeft 0.25s'
+
 			}
 			if (index === 3) {
 
@@ -216,7 +216,7 @@ function handleViewTable(){
 				if (!slideBarContent.classList.contains('slide-bar-close')) {
 					slideBarBtn.click();
 				}
-				
+
 			}
 		})
 	})
@@ -251,7 +251,7 @@ function renderYear() {
 		`
 	}
 	for (let i = 1; i <= 12; i++) {
-		xDate.setMonth(i-1);
+		xDate.setMonth(i - 1);
 		mapping(xDate);
 		const emptyDates = new Date(xDate.getFullYear(), xDate.getMonth(), 1).getDay();
 		const cal_daysIndex = document.querySelector("#cal__days" + `${i}`)
@@ -307,6 +307,7 @@ function handleAT(day, tabDay, check) {
 			tabDay.classList.remove("today")
 		}
 	}
+	tabDay.style.boxShadow="rgba(0, 0, 0, 0.35) 0px 5px 15px"
 }
 // xử lí thao tác next và prev
 function handleNP() {
@@ -340,21 +341,8 @@ function handleWeek() {
 	const weekdays = document.querySelectorAll('.weekdays');
 	const days = document.querySelectorAll('.days');
 
-	const clear = () => {
-		days.forEach(item => {
-			if (item.classList.contains("active")) {
-				item.classList.remove("active");
-			}
-			if (item.classList.contains("today")) {
-				item.classList.remove("today");
-			}
-			item.innerHTML = "";
-		})
-		weekdays.forEach(item => {
-			item.innerHTML = "";
-		})
-	}
-	clear();
+	
+	// clear();
 	const check = new Date()
 	const dayCheck = allDates.querySelector(".active");
 	const day = dayCheck !== null ? dayCheck.innerHTML : date.getDate();
@@ -367,10 +355,14 @@ function handleWeek() {
 	handleAT(day, days[index], check)
 	let dayNow = Number(day)
 	const lengthMonth = new Date(date.getFullYear(), date.getMonth() + 1, 0).getDate();
+
 	for (let i = index + 1; i < 7; i++) {
 		if (dayNow + 1 <= lengthMonth) {
 			days[i].innerHTML = ++dayNow;
-
+			days[i].style.boxShadow = "rgba(0, 0, 0, 0.35) 0px 5px 15px"
+			if(dayNow===date.getDate()){
+				days[i].classList.add('today')
+			}
 			weekdays[i].innerHTML = sevenDays[i]
 		}
 
@@ -380,11 +372,12 @@ function handleWeek() {
 
 		if (dayNow - 1 >= 1) {
 			days[i].innerHTML = --dayNow
-
-
+			days[i].style.boxShadow = "rgba(0, 0, 0, 0.35) 0px 5px 15px"
+			if(dayNow===date.getDate()){
+				days[i].classList.add('today')
+			}
 			weekdays[i].innerHTML = sevenDays[i]
 		}
-
 	}
 }
 // xử lí tháng

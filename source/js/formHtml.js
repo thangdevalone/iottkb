@@ -42,7 +42,7 @@ const login = `
             </div>
         </div>
     </div>
-    <span>Nếu bạn chưa có tài khoản? <span  class="span-dk span-dk-dn">Đăng kí ngay</span></span>
+
 </div>
 `
 const register = `
@@ -124,8 +124,6 @@ const register = `
           </div>
         </fieldset>
       </form>
-        <span>Tôi đã có tài khoản <span  class="span-dn span-dk-dn">Đăng nhập</span></span>
-
     </div>
 `
 

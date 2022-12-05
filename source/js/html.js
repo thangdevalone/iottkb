@@ -1,3 +1,4 @@
+
 const day = `
 <div class="row d-flex tabL">
     <div class="weekdays_days">
@@ -366,8 +367,8 @@ const baseTable = `
 </div>
 `
 const month = `
-<div class="row d-flex-table f-1-1 table pd-0">
-                    <div class="d-flex-table table-weekdays  pd-0">
+<div class="row d-flex-table f-1-1 table mg-0 pd-0">
+                    <div class="d-flex-table table-weekdays mg-0 pd-0">
                         <div class="table-weekday">CN</div>
                         <div class="table-weekday">TH 2</div>
                         <div class="table-weekday">TH 3</div>

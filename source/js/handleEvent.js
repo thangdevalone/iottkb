@@ -34,28 +34,34 @@ const calendarMonth = document.querySelector('.calendar-month');
 const btnCreate = document.querySelector('.btn-create');
 const btnExit = document.querySelector('.exit');
 const modal = document.querySelector('.modal');
-const cal_days = document.querySelector('.cal__days')
-
+const cal_days = document.querySelector('.cal__days');
+const fullUsers= document.querySelector('.all-user');
 
 slideBarBtn.addEventListener('click', function () {
     slideBarCol.classList.toggle('slide-bar-close');
     slideBarCol.classList.toggle('col-270');
     slideBarCol.classList.toggle('trans-05-ease-w-0');
     if (calendarMonth.classList.contains('trans-05-ease-l')) {
-        calendarMonth.classList.remove('trans-05-ease-l');
-        calendarMonth.classList.add('trans-05-ease-r');
-        btnCreate.classList.remove('trans-btn-05-ease-l');
-        btnCreate.classList.add('trans-btn-05-ease-r');
-
-
+        R_and_A(calendarMonth,true)
+        R_and_A(btnCreate,true)
+        R_and_A(fullUsers,true)
     } else {
-        calendarMonth.classList.add('trans-05-ease-l');
-        calendarMonth.classList.remove('trans-05-ease-r');
-        btnCreate.classList.add('trans-btn-05-ease-l');
-        btnCreate.classList.remove('trans-btn-05-ease-r');
+        R_and_A(calendarMonth,false)
+        R_and_A(btnCreate,false)
+        R_and_A(fullUsers,false)
     }
 })
+function R_and_A(element,remove){
+    if(remove===true){
+        element.classList.remove('trans-05-ease-l');
+        element.classList.add('trans-05-ease-r');
+    }
+    else{
+        element.classList.add('trans-05-ease-l');
+        element.classList.remove('trans-05-ease-r');
+    }
 
+}
 cal_days.addEventListener('click', function (e) {
     if (e.target.tagName === 'SPAN' && e.target.innerHTML !== '') {
         if (save !== e.target) {
@@ -170,3 +176,34 @@ function handleCreate() {
         }
     })
 }
+const loadingContainer= document.querySelector('.loading')
+const prog_1=loadingContainer.querySelector('#prog_1');
+function move() {
+    let prog_1=loadingContainer.querySelector('#prog_1');
+    const mess=loadingContainer.querySelector('#sub-progress .sub')
+    let width = 1;
+    const loading= setInterval(frame, 150);
+    function frame() {
+    if (width >= 100) {
+        clearInterval(loading);
+    } else {
+        width+=Math.floor(Math.random()*5);
+        if(width >=100){
+            width=100;
+            loadingContainer.querySelector('#sub-progress').innerHTML="Hoàn tất"
+            setTimeout(()=>{
+                loadingContainer.outerHTML=""
+            },1000)
+        }
+        if(width <40){
+            mess.innerHTML="Đang kiểm tra đăng nhập"
+        }
+        else{
+            mess.innerHTML="Đang tải dữ liệu"
+        }
+        prog_1.style.width = width + "%";
+        prog_1.innerHTML=width+ "%";
+    }
+    }
+}
+move()

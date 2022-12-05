@@ -4,7 +4,7 @@
   --color-black: #000;
   --color-white: #fff;
   --color-item-hover: #c1c1c1;
-  /* --color-bg-container */
+  --color-container: #021C43;
   --color-main: #f3661a;
   --color-user: #8c7bfb;
 }
@@ -12,6 +12,28 @@
   padding: 0;
   margin: 0;
   box-sizing: border-box;
+}
+/* ---------------------custom scrollbar--------------------- */
+/* width */
+*::-webkit-scrollbar {
+  width: 8px;
+  border-radius: 8px;
+}
+
+/* Track */
+*::-webkit-scrollbar-track {
+  background: #f1f1f1;
+  border-radius: 8px;
+}
+
+/* Handle */
+*::-webkit-scrollbar-thumb {
+  background: #888;
+  border-radius: 8px;
+}
+*::-webkit-scrollbar-thumb:hover {
+  background: #555;
+  border-radius: 8px;
 }
 body {
   color: var(--color-text-default);
@@ -35,7 +57,9 @@ ul {
 .h5 {
   margin-bottom: 0;
 }
-
+.fwb {
+  font-weight: bold;
+}
 .item-margin-lr-10 {
   margin: 0 10px 0 10px;
 }
@@ -130,7 +154,7 @@ ul {
 }
 .trans-05-ease-l {
   transition: all 0.3s ease;
-  transform: translateX(-250px);
+  transform: translateX(-250px) !important;
 }
 .trans-05-ease-r {
   transition: all 0.3s ease;
@@ -186,9 +210,9 @@ ul {
 }
 .tabL {
   animation: toLeft 0.25s;
+  margin-bottom: 5px;
 }
 .table__date {
-  box-shadow: rgba(0, 0, 0, 0.35) 0px 5px 15px;
   margin-left: 100px;
   width: 45px;
   height: 45px;
@@ -211,7 +235,7 @@ ul {
   width: 45px;
   height: 45px;
   margin-top: 5px;
-  box-shadow: rgba(0, 0, 0, 0.35) 0px 5px 15px;
+
   font-size: 28px;
   font-weight: 500;
   color: var(--color-black);
@@ -392,20 +416,23 @@ ul {
   left: -280px;
   z-index: 1000;
 }
-.feature{
-    border-radius: 10px;
-    font-size: 16px;
+.feature {
+  border-radius: 10px;
+  font-size: 16px;
 }
-.feature-flex{
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
+.feature-flex {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
 }
-.feature:hover{
-    background-color: #e4e4e5;
+.feature-flex.username-app{
+  justify-content:flex-start;
 }
-.btn-signOut:hover{
-    background-color: #e4e4e5!important;
+.feature:hover {
+  background-color: #e4e4e5;
+}
+.btn-signOut:hover {
+  background-color: #e4e4e5 !important;
 }
 .pd-0 {
   padding: 0 !important;
@@ -430,18 +457,124 @@ ul {
   margin: 0 !important;
   z-index: -1;
 }
-.fullCalendar-table{
-    display: grid;
-    grid-template-columns: 200px 200px 200px;
-    gap: 90px;
-    justify-content: center;
-    height: 500px;
-    overflow-y: scroll;
-    margin: 0px auto;
-    width: 1000px;
+.fullCalendar-table {
+  display: grid;
+  grid-template-columns: 200px 200px 200px;
+  gap: 90px;
+  justify-content: center;
+  height: 500px;
+  overflow-y: scroll;
+  margin: 0px auto;
+  width: 1000px;
 }
-/* ---------------------custom scrollbar--------------------- */
+#avt-preview {
+  border: 1px solid black;
+  border-radius: 5px;
+  width: 100px;
+  height: 100px;
+  margin-left: 10px;
+}
+.all-user {
+  border-radius: 5px;
+  width: 100%;
+  height: calc(100vh - 460px);
+  margin-bottom: 15px;
+  overflow-y: scroll;
+  padding:5px;
+}
+.all-user .all-user_avt{
+  width: 50px;
+  height: 50px;
+  border-radius: 50%;
+  border: 1px solid black;
+}
+.all-user .all-user_name{
+  font-size: 15px;
+  text-align: center;
+  color: black;
+  font-weight: 500;
+  margin-left: 10px;
+}
+.loading{
+  display: flex;
+  justify-content: flex-start;
+  align-items: center;
+  width: 100vw;
+  height: 100vh;
+  overflow: hidden;
+  background-color: #fff;
+  z-index: 10000;
+  position: fixed;
+
+}
+.main-load{
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-direction: column;
+  margin:0 auto;
+ 
+}
+.main-load .progress{
+  width: 300px;
+  border: 1px solid var(--color-container);
+  height: 25px;
+}
+.main-load .progress .progress-bar{
+  background-color: var(--color-container);
+
+}
+.main-load #sub-progress{
+  font-size: 16px;
+  font-weight: bold;
+  color: var(--color-container);
+}
+.loading .rote-main{
+  width: 600px;
+  height:600px;
+}
+.loading .rote-bg{
+  width: 70vw;
+  height: 70vw;
+  min-width: 1000px;
+  min-height: 1000px;
+  background-color: var(--color-container);
+  position: fixed;
+  top:-30%;
+  left: -40%;
+  clip-path: polygon(30% 0%, 70% 0%, 100% 30%, 100% 70%, 70% 100%, 30% 100%, 0% 70%, 0% 30%);
+  animation: rote-bg 10s linear infinite;
+}
+.loading .img-bg{  
+  background: url("https://ik.imagekit.io/TLIT/iot-soup_xOh-My6B0.png");
+  width: 400px;
+  height: 400px;
+  position: fixed;
+  top:50%;
+  left: -50px;
+  transform: translateY(-50%);
+  background-position: center;
+  background-size: 90%;
+  clip-path: polygon(30% 0%, 70% 0%, 100% 30%, 100% 70%, 70% 100%, 30% 100%, 0% 70%, 0% 30%);
+
+}
+.load
+/* ---------------------custom private scrollbar--------------------- */
 /* width */
+.all-user::-webkit-scrollbar {
+  border-radius: 5px;
+}
+.all-user::-webkit-scrollbar-track {
+  border-radius: 5px;
+}
+
+/* Handle */
+.all-user::-webkit-scrollbar-thumb {
+  border-radius: 5px;
+}
+.all-user::-webkit-scrollbar-thumb:hover {
+  border-radius: 5px;
+}
 .calendar-table-body::-webkit-scrollbar {
   width: 10px;
   border-radius: 10px;
@@ -469,5 +602,73 @@ ul {
   }
   100% {
     transform: translateX(0px);
+  }
+}
+@keyframes rote-bg{
+  0%{
+    transform: rotate(0deg);
+    transform-origin: center;
+
+  }
+  100%{
+    transform: rotate(360deg);
+    transform-origin: center;
+
+
+  }
+}
+/* ------------------------------------dotanimations-------------------------------- */
+.loader-demo-box {
+  border-radius: 0.25rem !important
+}
+
+.loader-demo-box {
+  width: 100%;
+  height: 200px
+}
+
+.jumping-dots-loader {
+  width: 100px;
+  height: 100px;
+  border-radius: 100%;
+  position: relative;
+  margin: 0 auto;
+}
+
+.jumping-dots-loader span {
+  display: inline-block;
+  width: 5px;
+  height: 5px;
+  border-radius: 100%;
+  background-color: var(--color-container);
+}
+
+.jumping-dots-loader span:nth-child(1) {
+  animation: bounce 0.6s ease-in-out infinite
+}
+.jumping-dots-loader span:nth-child(2) {
+  animation: bounce 0.6s ease-in-out 0.2s infinite
+}
+
+.jumping-dots-loader span:nth-child(3) {
+  animation: bounce 0.6s ease-in-out 0.4s infinite
+}
+
+@keyframes bounce {
+
+  0%,
+  75%,
+  100% {
+      -webkit-transform: translateY(0);
+      -ms-transform: translateY(0);
+      -o-transform: translateY(0);
+      transform: translateY(0)
+  }
+
+  25% {
+      -webkit-transform: translateY(-5px);
+      -ms-transform: translateY(-5px);
+      -o-transform: translateY(-5px);
+      transform: translateY(-5px)
   }
 }

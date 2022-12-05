@@ -10,6 +10,9 @@
   background-size: cover;
   color:black;
 }
+#infor{
+  height: calc(100% - 120px) ;
+}
 .form{
   position: relative;
   border-top:10px solid white;
@@ -100,7 +103,9 @@
   color:#565a5f;
   font-weight: 400;
 }
-
+.group .disabled{
+  color: #b2bacb ;
+}
 .group input:focus{
   border:2px solid #1a73e8;
 }

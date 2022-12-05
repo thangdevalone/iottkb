@@ -1,11 +1,14 @@
 import toast from "./toastMes.js";
 import animTab from "./calendar.js";
 import form from "./formHtml.js";
+import features from "./features.js";
+
 // Import the functions you need from the SDKs you need
 import { initializeApp } from "https://www.gstatic.com/firebasejs/9.13.0/firebase-app.js";
+
 import {
     getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, GoogleAuthProvider,
-    updateProfile, updateEmail, setPersistence, browserSessionPersistence
+    updateProfile, updateEmail, setPersistence, browserSessionPersistence,
 } from "https://www.gstatic.com/firebasejs/9.13.0/firebase-auth.js";
 import { getFirestore, collection, doc, setDoc, addDoc, getDocs, onSnapshot } from "https://www.gstatic.com/firebasejs/9.13.0/firebase-firestore.js";
 import { getStorage, ref, uploadBytesResumable, getDownloadURL } from "https://www.gstatic.com/firebasejs/9.13.0/firebase-storage.js";
@@ -67,28 +70,33 @@ const view = document.querySelectorAll(".view-list");
 const calTable = document.querySelector(".calendar-table")
 const cal_days = document.querySelector('.cal__days')
 const btnView = document.querySelector('.btn-view');
+
 let dataDate = [];
 let colorUser;
 let nowYear = date.getFullYear();
 let signIn = false;
-let formInforCurrentUser = {};
-
+let inforCurrentUser = {};
+let usersInApp = []
 const timeStart = document.querySelector('.time-start');
 const timeEnd = document.querySelector('.time-end');
 
-
-
+const accountSignIn = document.querySelector(".account")
+const containerForm = document.querySelector(".branch-container");
 
 
 
 
 // Initialize Firebase
 const app = initializeApp(firebaseConfig);
-const provider = new GoogleAuthProvider(app);
+
+
+// const provider = new GoogleAuthProvider(app);
 const auth = getAuth(app);
+
 // Create a root reference
 const db = getFirestore(app)
 const storage = getStorage();
+sessionStorage.setItem('firebase:authUser:AIzaSyCzjVkgJF4mxzUbBtNM6he0A20lvOpdg3k:[DEFAULT]', sessionStorage.getItem('baseUser'))
 
 
 setPersistence(auth, browserSessionPersistence)
@@ -97,94 +105,252 @@ setPersistence(auth, browserSessionPersistence)
         // session only. Closing the window would clear any existing state even
         // if a user forgets to sign out.
         // ...
-        const user=auth.currentUser
-        if(user){
-            formInforCurrentUser = user;
-            async function GetAllUser() {
-                usersInApp = []
-                const querrySnapshot = await getDocs(collection(db, "users"));
-    
-                querrySnapshot.forEach(doc => {
-                    usersInApp.push(doc.data());
-                })
-                handleUserCurrent(usersInApp, user.uid)
+        async function get(){
+            await getAllUser()
+            if (auth.currentUser) {
+                handleUser(auth.currentUser)
+                signIn = true;
             }
-            // get all dataa user
-            GetAllUser()
-            // New sign-in will be persisted with session persistence.
-            signIn = true;
-    
-            const html = `
-            <img style="width: 50px;
-                        height: 50px;
-                        border-radius: 50%;
+        }
+        get()
+       
+        // New sign-in will be persisted with session persistence.
+    })
+    .catch(() => {
+        getAllUser()
+
+    });
+function renderUser(user){
+    const html = `
+    <img style="width: 50px;
+                height: 50px;
+                border-radius: 50%;
+                object-fit: cover;
+                border:2px solid black;" 
+        src="${user.photoURL}" atl="avt"/>
+    <div id='accout-infor'>
+        <div class='userInfor'>
+            <img style="width: 100px;
+                        height: 100px;
                         object-fit: cover;
+                        border-radius: 50%;
                         border:2px solid black;" 
                 src="${user.photoURL}" atl="avt"/>
-            <div id='accout-infor'>
-                <div class='userInfor'>
-                    <img style="width: 100px;
-                                height: 100px;
-                                object-fit: cover;
-                                border-radius: 50%;
-                                border:2px solid black;" 
-                        src="${user.photoURL}" atl="avt"/>
-                    <div style="margin:10px;0;font-weight:bold;font-size:20px">${user.displayName}</div>
-                    <div style="font-size:16px; font-weight:400px;color:var(--color-text-default)">${user.email}</div>
-                </div>
-                <div style='width:350px;height:1px;background-color:var(--color-text-default)'></div>
-                <div style="width:100%">
-                    <ul>
-                        <li class="pd-10 cursor-pointer feature feature-flex" id="logUserInfor">
-                        <div>Thông tin tài khoản</div><div><svg width="18" height="18" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                        <path d="M17 21H7C3 21 2 20 2 16V8C2 4 3 3 7 3H17C21 3 22 4 22 8V16C22 20 21 21 17 21Z" stroke="#292D32" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
-                        <path d="M14 8H19" stroke="#292D32" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
-                        <path d="M15 12H19" stroke="#292D32" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
-                        <path d="M17 16H19" stroke="#292D32" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
-                        <path d="M8.49994 11.2899C9.49958 11.2899 10.3099 10.4796 10.3099 9.47992C10.3099 8.48029 9.49958 7.66992 8.49994 7.66992C7.50031 7.66992 6.68994 8.48029 6.68994 9.47992C6.68994 10.4796 7.50031 11.2899 8.49994 11.2899Z" stroke="#292D32" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
-                        <path d="M12 16.33C11.86 14.88 10.71 13.74 9.26 13.61C8.76 13.56 8.25 13.56 7.74 13.61C6.29 13.75 5.14 14.88 5 16.33" stroke="#292D32" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
-                        </svg>
-                        </div>
-                        </li>
-                        <li class="pd-10 cursor-pointer feature feature-flex" id="logDataWareHouse">
-                        <div>Kho dữ liệu</div><div><svg width="18" height="18" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                        <path d="M9.02 2.83992L3.63 7.03992C2.73 7.73992 2 9.22992 2 10.3599V17.7699C2 20.0899 3.89 21.9899 6.21 21.9899H17.79C20.11 21.9899 22 20.0899 22 17.7799V10.4999C22 9.28992 21.19 7.73992 20.2 7.04992L14.02 2.71992C12.62 1.73992 10.37 1.78992 9.02 2.83992Z" stroke="#292D32" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
-                        <path d="M10.5 18H13.5C15.15 18 16.5 16.65 16.5 15V12C16.5 10.35 15.15 9 13.5 9H10.5C8.85 9 7.5 10.35 7.5 12V15C7.5 16.65 8.85 18 10.5 18Z" stroke="#292D32" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
-                        <path d="M12 9V18" stroke="#292D32" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
-                        <path d="M7.5 13.5H16.5" stroke="#292D32" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
-                        </svg>
-                        </div>
-                        </li>
-                        <li class="pd-10 cursor-pointer feature feature-flex" id="logDataAnalystics">
-                        <div>Phân tích dữ liệu</div><div><svg width="18" height="18" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                        <path d="M2 2V19C2 20.66 3.34 22 5 22H22" stroke="#292D32" stroke-width="1.5" stroke-miterlimit="10" stroke-linecap="round" stroke-linejoin="round"/>
-                        <path d="M5 17L9.59 11.64C10.35 10.76 11.7 10.7 12.52 11.53L13.47 12.48C14.29 13.3 15.64 13.25 16.4 12.37L21 7" stroke="#292D32" stroke-width="1.5" stroke-miterlimit="10" stroke-linecap="round" stroke-linejoin="round"/>
-                        </svg>
-                        </div>
-                        </li>
-                    </ul>
-                </div>
-                
-                <button class='btn btn-outline-primary btn-signOut' style="width:80%;height:50px;font-size:18px;">Đăng xuất tài khoản</button>  
-            </div>
-            `
-            accountSignIn.innerHTML = html
-            signOut()
-    
-        }
-        
+            <div style="margin:10px 0 5px 0;font-weight:bold;font-size:20px">${user.displayName}</div>
+            <div style="font-size:16px; font-weight:400px;color:var(--color-text-default)">${user.email}</div>
+        </div>
+        <div style='width:350px;height:1px;background-color:var(--color-text-default)'></div>
+
+        ${inforCurrentUser.isAdmin === true ? features.feature_admin : features.feature_user}
+        <button class='btn btn-outline-primary btn-signOut' style="width:80%;height:50px;font-size:18px;">Đăng xuất tài khoản</button>  
+    </div>
+    `
+    return html
+}
+function handleUser(user) {
+    handleUserCurrent(usersInApp, user.uid)
+    accountSignIn.innerHTML = renderUser(user)
+    handleFeatures()
+    signOut()
+}
+async function getAllUser(){
+    usersInApp = []
+    const querrySnapshot = await getDocs(collection(db, "users"));
+    querrySnapshot.forEach(doc => {
+        usersInApp.push(doc.data());
     })
-    .catch((error) => {
-        // Handle Errors here.
-        const errorCode = error.code;
-        const errorMessage = error.message;
+    renderFullUser()
+
+}
+
+function renderFullUser(){
+    const fullUserBox=document.querySelector('.all-user ul');
+    const html= usersInApp.map((user,idx)=>{
+        return `
+        <li class="pd-10 cursor-pointer feature feature-flex username-app" class="feature" id="user${idx}">
+        <div><img class="all-user_avt" src=${user.avt} alt="avt"></div>
+        <span class="all-user_name">
+            ${user.name}
+        </span>
+        </li>
+        `
+    })
+    fullUserBox.innerHTML=html.join('');
+}
+const handleFeatures = () => {
+    document.getElementById('logUserInfor').addEventListener('click', () => { featureInfor() });
+    document.getElementById('logDataWareHouse').addEventListener('click', () => { });
+    document.getElementById('logDataAnalystics').addEventListener('click', () => { });
+    document.getElementById('logCreateAccount')?.addEventListener('click', () => {
+        containerForm.style.display = "flex";
+        containerForm.innerHTML = form.register;
+        registerForm()
     });
 
-let usersInApp = []
+}
+
+
+const featureInfor = () => {
+    const modal = document.querySelector('.modal-features')
+    modal.style.display = "flex";
+    modal.classList.add('on')
+    modal.innerHTML = features.feature_infor
+    const exit = modal.querySelector('.exit-feature')
+    exit.onclick = () => {
+        modal.style.display = "none";
+        modal.classList.remove('on')
+        modal.innerHTML = ""
+    }
+    document.onclick = (e) => {
+
+        if (e.target.classList.contains('modal-features')) {
+            exit.click()
+        }
+    }
+    const formInfor = document.querySelector('#infor')
+    const input = formInfor.querySelectorAll('input')
+
+    const nameInput = formInfor.querySelector('#name')
+    const idgvInput = formInfor.querySelector('#idgv')
+    const emailInput = formInfor.querySelector('#email')
+    const adminInput = formInfor.querySelector('#admin')
+    const stdInput = formInfor.querySelector('#sdt')
+    const avtview= formInfor.querySelector('#avt-preview')
+    const inputImg=formInfor.querySelector('#avt-file')
+    avtview.src=inforCurrentUser.avt
+    nameInput.value = inforCurrentUser.name
+    idgvInput.value = inforCurrentUser.mgv
+    emailInput.value = inforCurrentUser.email
+    adminInput.value = inforCurrentUser.isAdmin === true ? "Bạn là Admin" : "Bạn không phải là Admin"
+    stdInput.value = inforCurrentUser.phoneNumber ? inforCurrentUser.phoneNumber : ""
+    let photoURL
+    input.forEach(x => {
+        x.addEventListener('blur', () => {
+            if (x.value !== '') {
+                x.classList.add('used');
+            }
+            else {
+                x.classList.remove('used')
+            }
+        })
+        if (!x.classList.contains('used')) {
+            if (x.value !== '') {
+                x.classList.add('used');
+            }
+            else {
+                x.classList.remove('used')
+            }
+        }
+
+    })
+    inputImg.addEventListener('change', () => {
+        var reader = new FileReader();
+        if (inputImg.files[0] !== undefined) {
+            reader.readAsDataURL(inputImg.files[0]);
+            reader.onload = function (e) {
+                const image = new Image();
+                image.src = e.target.result;
+                image.onload = () => {
+                    avtview.src=image.src
+                }
+            }
+        }
+        else{
+            avtview.src=inforCurrentUser.avt
+        }
+    })
+    formInfor.onsubmit=(e)=>{
+        e.preventDefault();
+        const user=auth.currentUser
+        if (inputImg.files[0]) {
+            addfile()
+        }
+        else {
+            photoURL = avtview.src
+            repairDocument()
+        }
+        function addfile() {
+            const picture=inputImg.files[0]
+            const storageRef = ref(storage, 'users/' + user.uid + '/profile.' + picture.type.slice((picture.type).indexOf('/') + 1));
+            const metadata = {
+                contentType: picture.type,
+            };
+            // 'file' comes from the Blob or File API
+            const uploadTask = uploadBytesResumable(storageRef, picture, metadata);
+
+            // Listen for state changes, errors, and completion of the upload.
+            uploadTask.on('state_changed',
+                (snapshot) => {
+                    // Get task progress, including the number of bytes uploaded and the total number of bytes to be uploaded
+
+
+                    switch (snapshot.state) {
+                        case 'paused':
+                            warning('Upload is paused!')
+                            break;
+                    }
+                },
+                (error) => {
+                    // A full list of error codes is available at
+                    switch (error.code) {
+                        case 'storage/unauthorized':
+                            // User doesn't have permission to access the object
+                            warning('Upload is unauthorized!')
+
+                            break;
+                        case 'storage/canceled':
+                            // User canceled the upload
+                            warning('Upload is canceled!')
+
+                            break;
+
+                        // ...
+
+                        case 'storage/unknown':
+                            // Unknown error occurred, inspect error.serverResponse
+                            warning('Upload is unknown!')
+
+                            break;
+                    }
+                },
+                () => {
+                    // Upload completed successfully, now we can get the download URL
+                    getDownloadURL(uploadTask.snapshot.ref).then((downloadURL) => {
+                        photoURL = downloadURL;
+                        repairDocument()
+                    });
+                }
+            );
+        }
+        async function repairDocument() {
+            inforCurrentUser={...inforCurrentUser,mgv:idgvInput.value,phoneNumber:stdInput.value,name:nameInput.value,avt:photoURL}
+            try {
+                const docRef = await setDoc(doc(db, "users", `${inforCurrentUser.userID}`),inforCurrentUser);
+                await updateProfile(user, {
+                    displayName: nameInput.value, photoURL: photoURL,
+                })
+                exit.click()
+                success('Sửa thông tin thành công!')
+                async function repair(){
+                    await getAllUser()
+                    accountSignIn.innerHTML = renderUser(user)
+                    handleFeatures()
+                    signOut()
+                    preLoad()
+                }
+                repair()
+            } catch (e) {
+                console.error("Error adding document: ", e);
+                fail("Sửa thông tin thất bại")
+            }
+        }
+       
+    }
+}
+
 
 
 // update DateDate
-GetYearDate()
 async function GetYearDate() {
     dataDate = []
     const querrySnapshot = await getDocs(collection(db, `${date.getFullYear()}`));
@@ -192,52 +358,42 @@ async function GetYearDate() {
         dataDate.push(doc.data());
     })
     preLoad()
-
-
 }
 
-
-const accountSignIn = document.querySelector(".account")
-const containerForm = document.querySelector(".branch-container");
-
+// lắng nghe  thay đổi database
+onSnapshot(collection(db, `${date.getFullYear()}`), (snapshot) => {
+    GetYearDate()
+});
 
 accountSignIn.addEventListener('click', () => {
     if (signIn === false) {
         containerForm.style.display = "flex";
         loginForm()
     }
-    else {
-        handleWhenSignIn();
-    }
 })
 
-// handle when signIn 
-function handleWhenSignIn() {
-
-}
 // handle user current 
 function handleUserCurrent(userMap, currentUserID) {
     const userCurrentIndex = userMap.findIndex(x => x.userID === currentUserID);
-    const colorUserCurrent = userMap[userCurrentIndex].color
-    document.querySelector(':root').style.setProperty('--color-user', `${colorUserCurrent}`);
-    colorUser = colorUserCurrent
+    inforCurrentUser = { ...userMap[userCurrentIndex] }
+    document.querySelector(':root').style.setProperty('--color-user', `${inforCurrentUser.color}`);
+    colorUser = inforCurrentUser.color
 }
 
 //login------------------------------------------
 
 function loginForm() {
     containerForm.innerHTML = form.login
-    document.querySelector(".span-dk").onclick = () => registerForm();
     const loginForm = document.querySelector("#login");
     const input = document.querySelectorAll(".group input");
     const exitForm = document.querySelector('.exit-form');
-    const eye=document.querySelector('#passEyeLogin')
+    const eye = document.querySelector('#passEyeLogin');
 
-    eye.addEventListener('click', ()=>{
-        if(eye.classList.contains('show')){
-            loginForm.querySelector('#passLogin').type="password";
+    eye.addEventListener('click', () => {
+        if (eye.classList.contains('show')) {
+            loginForm.querySelector('#passLogin').type = "password";
             eye.classList.remove('show');
-            eye.innerHTML=`
+            eye.innerHTML = `
             <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
             <path d="M14.53 9.47004L9.47004 14.53C8.82004 13.88 8.42004 12.99 8.42004 12C8.42004 10.02 10.02 8.42004 12 8.42004C12.99 8.42004 13.88 8.82004 14.53 9.47004Z" stroke="#292D32" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
             <path d="M17.82 5.76998C16.07 4.44998 14.07 3.72998 12 3.72998C8.46997 3.72998 5.17997 5.80998 2.88997 9.40998C1.98997 10.82 1.98997 13.19 2.88997 14.6C3.67997 15.84 4.59997 16.91 5.59997 17.77" stroke="#292D32" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
@@ -249,10 +405,10 @@ function loginForm() {
             
             `
         }
-        else{
-            loginForm.querySelector('#passLogin').type="text";
+        else {
+            loginForm.querySelector('#passLogin').type = "text";
             eye.classList.add('show');
-            eye.innerHTML=`
+            eye.innerHTML = `
             <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
             <path d="M15.58 12C15.58 13.98 13.98 15.58 12 15.58C10.02 15.58 8.42004 13.98 8.42004 12C8.42004 10.02 10.02 8.42004 12 8.42004C13.98 8.42004 15.58 10.02 15.58 12Z" stroke="#292D32" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
             <path d="M12 20.27C15.53 20.27 18.82 18.19 21.11 14.59C22.01 13.18 22.01 10.81 21.11 9.39997C18.82 5.79997 15.53 3.71997 12 3.71997C8.46997 3.71997 5.17997 5.79997 2.88997 9.39997C1.98997 10.81 1.98997 13.18 2.88997 14.59C5.17997 18.19 8.46997 20.27 12 20.27Z" stroke="#292D32" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
@@ -280,86 +436,18 @@ function loginForm() {
         e.preventDefault()
         const email = loginForm.querySelector('#emailLogin').value;
         const password = loginForm.querySelector('#passLogin').value;
-
         signInWithEmailAndPassword(auth, email, password)
             .then((userCredential) => {
                 const user = userCredential.user;
-                formInforCurrentUser = user;
-                async function GetAllUser() {
-                    usersInApp = []
-                    const querrySnapshot = await getDocs(collection(db, "users"));
-
-                    querrySnapshot.forEach(doc => {
-                        usersInApp.push(doc.data());
-                    })
-                    handleUserCurrent(usersInApp, user.uid)
-                }
-                // get all dataa user
-                GetAllUser()
+                handleUser(user)
                 // Signed in 
-
                 success("Bạn đã đăng nhập tài khoản thành công.")
                 signIn = true;
-
-                const html = `
-        <img style="width: 50px;
-                    height: 50px;
-                    object-fit: cover;
-                    border-radius: 50%;
-                    border:2px solid black;" 
-            src="${user.photoURL}" atl="avt"/>
-        <div id='accout-infor'>
-            <div class='userInfor'>
-                <img style="width: 100px;
-                            height: 100px;
-                            object-fit: cover;
-                            border-radius: 50%;
-                            border:2px solid black;" 
-                    src="${user.photoURL}" atl="avt"/>
-                <div style="margin:10px;0;font-weight:bold;font-size:20px">${user.displayName}</div>
-                <div style="font-size:16px; font-weight:400px;color:var(--color-text-default)">${user.email}</div>
-            </div>
-            <div style='width:350px;height:1px;background-color:var(--color-text-default)'></div>
-            <div style="width:100%">
-                <ul>
-                    <li class="pd-10 cursor-pointer feature feature-flex" id="logUserInfor">
-                    <div>Thông tin tài khoản</div><div><svg width="18" height="18" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                    <path d="M17 21H7C3 21 2 20 2 16V8C2 4 3 3 7 3H17C21 3 22 4 22 8V16C22 20 21 21 17 21Z" stroke="#292D32" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
-                    <path d="M14 8H19" stroke="#292D32" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
-                    <path d="M15 12H19" stroke="#292D32" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
-                    <path d="M17 16H19" stroke="#292D32" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
-                    <path d="M8.49994 11.2899C9.49958 11.2899 10.3099 10.4796 10.3099 9.47992C10.3099 8.48029 9.49958 7.66992 8.49994 7.66992C7.50031 7.66992 6.68994 8.48029 6.68994 9.47992C6.68994 10.4796 7.50031 11.2899 8.49994 11.2899Z" stroke="#292D32" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
-                    <path d="M12 16.33C11.86 14.88 10.71 13.74 9.26 13.61C8.76 13.56 8.25 13.56 7.74 13.61C6.29 13.75 5.14 14.88 5 16.33" stroke="#292D32" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
-                    </svg>
-                    </div>
-                    </li>
-                    <li class="pd-10 cursor-pointer feature feature-flex" id="logDataWareHouse">
-                    <div>Kho dữ liệu</div><div><svg width="18" height="18" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                    <path d="M9.02 2.83992L3.63 7.03992C2.73 7.73992 2 9.22992 2 10.3599V17.7699C2 20.0899 3.89 21.9899 6.21 21.9899H17.79C20.11 21.9899 22 20.0899 22 17.7799V10.4999C22 9.28992 21.19 7.73992 20.2 7.04992L14.02 2.71992C12.62 1.73992 10.37 1.78992 9.02 2.83992Z" stroke="#292D32" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
-                    <path d="M10.5 18H13.5C15.15 18 16.5 16.65 16.5 15V12C16.5 10.35 15.15 9 13.5 9H10.5C8.85 9 7.5 10.35 7.5 12V15C7.5 16.65 8.85 18 10.5 18Z" stroke="#292D32" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
-                    <path d="M12 9V18" stroke="#292D32" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
-                    <path d="M7.5 13.5H16.5" stroke="#292D32" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
-                    </svg>
-                    </div>
-                    </li>
-                    <li class="pd-10 cursor-pointer feature feature-flex" id="logDataAnalystics">
-                    <div>Phân tích dữ liệu</div><div><svg width="18" height="18" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                    <path d="M2 2V19C2 20.66 3.34 22 5 22H22" stroke="#292D32" stroke-width="1.5" stroke-miterlimit="10" stroke-linecap="round" stroke-linejoin="round"/>
-                    <path d="M5 17L9.59 11.64C10.35 10.76 11.7 10.7 12.52 11.53L13.47 12.48C14.29 13.3 15.64 13.25 16.4 12.37L21 7" stroke="#292D32" stroke-width="1.5" stroke-miterlimit="10" stroke-linecap="round" stroke-linejoin="round"/>
-                    </svg>
-                    </div>
-                    </li>
-                </ul>
-            </div>
-            
-            <button class='btn btn-outline-primary btn-signOut' style="width:80%;height:50px;font-size:18px;">Đăng xuất tài khoản</button>  
-        </div>
-        `
-                accountSignIn.innerHTML = html
-                signOut()
                 setTimeout(() => {
                     containerForm.style.display = "none"
-                }, 1000)
+                    containerForm.innerHTML =""
+                    sessionStorage.setItem('baseUser', sessionStorage.getItem('firebase:authUser:AIzaSyCzjVkgJF4mxzUbBtNM6he0A20lvOpdg3k:[DEFAULT]'))
+                }, 500)
 
             })
             .catch((e) => {
@@ -373,8 +461,8 @@ function loginForm() {
 
 // regiser--------------------------------------------- 
 function registerForm() {
+    sessionStorage.setItem('baseUser', sessionStorage.getItem('firebase:authUser:AIzaSyCzjVkgJF4mxzUbBtNM6he0A20lvOpdg3k:[DEFAULT]'))
     containerForm.innerHTML = form.register
-    document.querySelector(".span-dn").onclick = () => loginForm();
     const sourceBase = document.querySelector(".source-base");
     const sourceBaseImgs = document.querySelector(".source-base_imgs");
     const img_preview = document.querySelector('.img-preview');
@@ -387,13 +475,13 @@ function registerForm() {
     const submitForm = document.querySelector('#btnSubRes');
     const input = document.querySelectorAll(".group input");
     const exitForm = document.querySelector('.exit-form');
-    const eye=document.querySelector('#passEyeRegister')
-
-    eye.addEventListener('click', ()=>{
-        if(eye.classList.contains('show')){
-            loginForm.querySelector('#passRegister').type="password";
+    const eye = document.querySelector('#passEyeRegister');
+    const registerForm = document.querySelector('#register');
+    eye.addEventListener('click', () => {
+        if (eye.classList.contains('show')) {
+            registerForm.querySelector('#passRegister').type = "password";
             eye.classList.remove('show');
-            eye.innerHTML=`
+            eye.innerHTML = `
             <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
             <path d="M14.53 9.47004L9.47004 14.53C8.82004 13.88 8.42004 12.99 8.42004 12C8.42004 10.02 10.02 8.42004 12 8.42004C12.99 8.42004 13.88 8.82004 14.53 9.47004Z" stroke="#292D32" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
             <path d="M17.82 5.76998C16.07 4.44998 14.07 3.72998 12 3.72998C8.46997 3.72998 5.17997 5.80998 2.88997 9.40998C1.98997 10.82 1.98997 13.19 2.88997 14.6C3.67997 15.84 4.59997 16.91 5.59997 17.77" stroke="#292D32" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
@@ -404,15 +492,14 @@ function registerForm() {
             </svg>
             `
         }
-        else{
-            loginForm.querySelector('#passRegister').type="text";
+        else {
+            registerForm.querySelector('#passRegister').type = "text";
             eye.classList.add('show');
-            eye.innerHTML=`
+            eye.innerHTML = `
             <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
             <path d="M15.58 12C15.58 13.98 13.98 15.58 12 15.58C10.02 15.58 8.42004 13.98 8.42004 12C8.42004 10.02 10.02 8.42004 12 8.42004C13.98 8.42004 15.58 10.02 15.58 12Z" stroke="#292D32" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
             <path d="M12 20.27C15.53 20.27 18.82 18.19 21.11 14.59C22.01 13.18 22.01 10.81 21.11 9.39997C18.82 5.79997 15.53 3.71997 12 3.71997C8.46997 3.71997 5.17997 5.79997 2.88997 9.39997C1.98997 10.81 1.98997 13.18 2.88997 14.59C5.17997 18.19 8.46997 20.27 12 20.27Z" stroke="#292D32" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
             </svg>            
-
             `
         }
     })
@@ -477,8 +564,6 @@ function registerForm() {
             sourceBase.classList.remove('d-block')
         }
     })
-
-
 
     exitForm.onclick = () => {
         containerForm.style.display = "none"
@@ -554,15 +639,20 @@ function registerForm() {
                     name: formName,
                     mgv: formIdgv,
                     color: colorPicker,
-                    avt: img
+                    avt: img,
+                    phoneNumber:"",
+                    email: formEmail,
+                    isAdmin: false
                 });
 
             } catch (e) {
                 console.error("Error adding document: ", e);
             }
         }
+
         createUserWithEmailAndPassword(auth, formEmail, formPass)
             .then((userCredential) => {
+
                 const user = userCredential.user;
                 // create data base
 
@@ -656,9 +746,11 @@ function registerForm() {
 
                         // ...
                     });
-                    containerForm.innerHTML = form.login
-                    loginForm()
+
+
                 }
+                containerForm.style.display = "none";
+                containerForm.innerHTML = "";
 
             })
             .catch((error) => {
@@ -669,43 +761,45 @@ function registerForm() {
             });
 
     })
+
 }
 
 //sign out
 
-function signOut(){
-    const account= document.querySelector('.account img');
-    const accoutInfor=document.querySelector('#accout-infor');
-    const btnSignOut=document.querySelector('.btn-signOut');
+function signOut() {
+    const account = document.querySelector('.account img');
+    const accoutInfor = document.querySelector('#accout-infor');
     // đăng xuất
-    btnSignOut.addEventListener('click', () =>{
-        auth.signOut().then(()=>{
+    const btnSignOut = document.querySelector('.btn-signOut');
+    btnSignOut.addEventListener('click', () => {
+        auth.signOut().then(() => {
             success('Đăng xuất thành công');
-            signIn=false;
-            accountSignIn.innerHTML=`<span  class="account-name btn btn-outline-primary btn-signIn ">Đăng nhập</span>`
+            signIn = false;
+            sessionStorage.removeItem('baseUser');
+            accountSignIn.innerHTML = `<span  class="account-name btn btn-outline-primary btn-signIn ">Đăng nhập</span>`
         })
-        .catch(()=>{
-            fail('Đăng xuất thất bại! Thử lại sau')
-        })
+            .catch(() => {
+                fail('Đăng xuất thất bại! Thử lại sau')
+            })
     });
-    account.addEventListener('click' ,(e) =>{
+    account.addEventListener('click', (e) => {
         e.stopPropagation();
-        if(!accoutInfor.classList.contains('d-flex')){
+        if (!accoutInfor.classList.contains('d-flex')) {
             accoutInfor.classList.add('d-flex');
-            accoutInfor.style.alignItems="center";
-            accoutInfor.style.flexDirection="column";
-            accoutInfor.style.justifyContent="space-between";
+            accoutInfor.style.alignItems = "center";
+            accoutInfor.style.flexDirection = "column";
+            accoutInfor.style.justifyContent = "space-between";
         }
-        else{
+        else {
             accoutInfor.classList.remove('d-flex');
         }
     })
-    accoutInfor.addEventListener('click', (e) =>{
+    accoutInfor.addEventListener('click', (e) => {
         e.stopPropagation();
-        
+
     })
-    document.addEventListener('click' ,() =>{
-        if(accoutInfor.classList.contains('d-flex')){
+    document.querySelector('.main').addEventListener('click', () => {
+        if (accoutInfor.classList.contains('d-flex')) {
             accoutInfor.classList.remove('d-flex');
         }
     })
@@ -780,7 +874,7 @@ function renderRegister() {
             const length = -start + end
             // data đăng kí
             const data = {
-                author: formInforCurrentUser.displayName,
+                author: inforCurrentUser.userID,
                 title: headerText !== '' ? headerText : 'No title',
                 bodyTitle: bodyText !== '' ? bodyText : 'No Description',
                 timeStart: timeStartText,
@@ -797,9 +891,6 @@ function renderRegister() {
             // kiểm tra vị trí đó đã đăng kí chưa
             const findIndex = dataDate.findIndex(x => (x.id_month == date.getMonth() + 1 && x.date === day))
 
-            if (findIndex !== -1) {
-
-            }
             // nếu tìm thấy
             if (findIndex !== -1) {
                 for (let i = start - 1; i < end - 1; i++) {
@@ -840,10 +931,8 @@ function renderRegister() {
     }
 }
 
-// lắng nghe  thay đổi database
-const unsubscribe = onSnapshot(collection(db, `${date.getFullYear()}`), (snapshot) => {
-    GetYearDate()
-});
+
+
 
 function pushDay(data, registerTime) {
     const dayCheck = cal_days.querySelector(".active");
@@ -853,7 +942,6 @@ function pushDay(data, registerTime) {
         return x === dayIndex;
     })
     let find = false;
-
     async function addDocument(data, idx) {
         try {
             await setDoc(doc(db, `${date.getFullYear()}`, `${data.date}-${data.id_month}-${date.getFullYear()}`), data);
@@ -861,8 +949,6 @@ function pushDay(data, registerTime) {
                 dataDate.push(data);
             }
             success();
-
-            preLoad()
         }
         catch (e) {
             console.log(e)
@@ -894,7 +980,6 @@ function pushDay(data, registerTime) {
             date: day,
             thuIndex: index,
             data: [
-
             ],
             registerTime: registerTime,
             authors: []
@@ -908,10 +993,14 @@ function pushDay(data, registerTime) {
         })
         addDocument(dataDay, 2)
     }
-
+    // preLoad()
 }
 // neu co data thi in trươc khi thao tác
 function preLoad() {
+    const allPopup = document.querySelectorAll('.popupTime')
+    for(let i = 0; i < allPopup.length; i++){
+        allPopup[i].outerHTML=""
+    }
     //đang ở view ngày
     if (where == 1) {
         const dayCheck = cal_days.querySelector(".active");
@@ -960,22 +1049,23 @@ function preLoad() {
         })
     }
     if (where == 4) {
-        for(let i=0; i<dataDate.length;i++){
-            const dayCheck=document.querySelectorAll(`#cal__days${dataDate[i].id_month} .daysInMonth`)[dataDate[i].date-1]
-            console.log(dayCheck,dataDate[i].id_month)
-            dayCheck.style.border="2px solid red";
+        for (let i = 0; i < dataDate.length; i++) {
+            const dayCheck = document.querySelectorAll(`#cal__days${dataDate[i].id_month} .daysInMonth`)[dataDate[i].date - 1]
+            console.log(dayCheck, dataDate[i].id_month)
+            dayCheck.style.border = "2px solid red";
         }
     }
 }
 
 // render ra popup
 function renderPopupTime(data, index = -1, array = []) {
+    const author=(usersInApp.filter(x=>x.userID===data.author))[0].name
     if (where == 1) {
         const timeTable = document.querySelector('.time-table');
 
         const popupTime = `
         <div class="popupTime" style="position: absolute; height:${data.lengthDiv}; top:${data.pos};  background-color: ${data.color};">
-            <span class="headerPopupTimes">${data.title} | ${data.timeStart} <i class="fa-solid fa-minus"></i> ${data.timeEnd} | ${data.author} </span> 
+            <span class="headerPopupTimes">${data.title} | ${data.timeStart} <i class="fa-solid fa-minus"></i> ${data.timeEnd} | ${author} </span> 
             <div class="bodyPopupTimes">Des: ${data.bodyTitle}</div>
         </div>
         `
@@ -987,7 +1077,7 @@ function renderPopupTime(data, index = -1, array = []) {
         const popupTime = `
     
         <div class="popupTime" style=" position: absolute;height:${data.lengthDiv};width:calc(14% - 2px); top:${data.pos};left:${(index * 14)}%; background-color: ${data.color};">
-            <span style="width:calc(14% - 2px);" class="headerPopupTimes">${data.title} | ${data.timeStart} <i class="fa-solid fa-minus"></i> ${data.timeEnd} | ${data.author} </span> 
+            <span style="width:calc(14% - 2px);" class="headerPopupTimes">${data.title} | ${data.timeStart} <i class="fa-solid fa-minus"></i> ${data.timeEnd} | ${author} </span> 
             <div style="width: 90%;height:" class="bodyPopupTimes">Des: ${data.bodyTitle}</div>
         </div>
         `

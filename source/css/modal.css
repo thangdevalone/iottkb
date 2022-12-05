@@ -1,8 +1,25 @@
 .modal-header{
     background-color: #F1F3F4;
 }
+.title-imp{
+    color:red;
+    font-weight: bold;
+    font-size: 20px;
+}
 .exit{
     font-size: 18px;
+}
+.modal-features.on{
+    width: 100vw;
+    height: 100vh;
+    background-color: rgba(0, 0, 0, 0.45);
+    position: fixed;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+    top:0;
+    left: 0;
 }
 .modal{
     display: none;
@@ -17,7 +34,16 @@
     border-radius: 10px;
     animation: scaleUp 0.6s ease;
     overflow-y: hidden;
+}
 
+.modal-features .infor-event{
+    display: block;
+    animation: none;
+    width: 70%;
+    height: 75%;
+}
+.modal-features .modal-header{
+    cursor:default;
 }
 .modal-header{
     justify-content:flex-end;
@@ -75,7 +101,7 @@
     padding:10px;
     font-size:16px ;
 }
-.btn-save{
+.btn-container{
     position: relative;
     left: 50%;
     height: 50px;
@@ -96,28 +122,7 @@
     }
 }
 
-/* ---------------------custom scrollbar--------------------- */
-/* width */
-.modal-body::-webkit-scrollbar {
-    width: 10px;
-    border-radius: 10px;
-}
-  
-/* Track */
-.modal-body::-webkit-scrollbar-track {
-    background: #f1f1f1; 
-    border-radius: 10px;
-}
-   
-  /* Handle */
-.modal-body::-webkit-scrollbar-thumb {
-    background: #888;
-    border-radius: 10px; 
-}
-.modal-body::-webkit-scrollbar-thumb:hover {
-    background: #555;
-    border-radius: 10px;
-}
+
 .thoi-gian{
     position: relative;
 }

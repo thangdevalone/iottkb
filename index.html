@@ -21,6 +21,20 @@
 </head>
 
 <body>
+  <div class="loading">
+    <div class="rote-main">
+      <div class="rote-bg"></div>
+      <div class="img-bg"></div>
+    </div>
+    <div class="main-load">
+      <p id="sub-progress"><span class="jumping-dots-loader"> <span></span> <span></span> <span></span> </span> <span class="sub"> </span> </p>
+      <div class="progress">
+        <div class="progress-bar" id="prog_1" role="progressbar" aria-valuemin="0" aria-valuemax="100">25%</div>
+      </div>
+    </div>
+    
+  </div>
+  
   <div class="branch-container" style="display: none;">  </div>
   <header>
     <div class="row">
@@ -68,10 +82,8 @@
   </header>
   <section class="main">
     <div class="row h-100 item-margin-r-10">
-      <div class=" col-270 slide-bar-content ">
-        <div class="">
-          <button class="btn btn-primary btn-create"><i class="fa-solid fa-calendar-plus"></i> Tạo</button>
-        </div>
+      <div class=" col-270 slide-bar-content "> 
+        <button class="btn btn-primary btn-create"><i class="fa-solid fa-calendar-plus"></i> Tạo</button>
         <div class="calendar-month">
           <div class="cal__main">
             <div class="cal__container">
@@ -106,10 +118,12 @@
           </div>
 
         </div>
+        <div class="all-user">
+          <ul>
+        </ul>
+        </div>
       </div>
       <div class="col calendar-table ">
-
-
       </div>
     </div>
 
@@ -117,8 +131,6 @@
 
   <!-- -----------------------------------------------modal--------------------------------------------- -->
   <div id="toast"></div>
-
-
   <div class="modal create-event">
     <div class="modal-header">
       <span class="exit cursor-pointer"><i class="fa-solid fa-xmark"></i></span>
@@ -175,17 +187,15 @@
         <textarea name="description" id="description-form" rows="5" cols="40" placeholder="Mô tả"
           spellcheck="false"></textarea>
       </div>
-      <input type="submit" class="btn btn-primary btn-save" value="Lưu">
+      <input type="submit" class="btn btn-primary btn-container btn-save" value="Lưu">
     </form>
   </div>
+  <div class="modal-features">
+  </div>
 
-
-  <script type="module" src="./source/js/html.js"></script>
-  <script type="module" src="./source/js/formHtml.js"></script>
   <script src="./source/js/handleEvent.js"></script>
   <script type="module" src="./source/js/App.js"></script>
   <script type="module" src="./source/js/calendar.js"></script>
-  <script type="module" src="./source/js/toastMes.js"></script>
 </body>
 
 </html>
