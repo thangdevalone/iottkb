@@ -182,7 +182,7 @@ function move() {
     let prog_1=loadingContainer.querySelector('#prog_1');
     const mess=loadingContainer.querySelector('#sub-progress .sub')
     let width = 1;
-    const loading= setInterval(frame, 150);
+    const loading= setInterval(frame, 100);
     function frame() {
     if (width >= 100) {
         clearInterval(loading);

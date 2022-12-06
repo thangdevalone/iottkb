@@ -558,7 +558,26 @@ ul {
   clip-path: polygon(30% 0%, 70% 0%, 100% 30%, 100% 70%, 70% 100%, 30% 100%, 0% 70%, 0% 30%);
 
 }
-.load
+.row-loading{
+  display: none;
+  position: fixed;
+  width: 100vw;
+  height: 5px;
+  background-color: #c1c1c1;
+  z-index: 10000000;
+  top:0;
+  left: 0;
+}
+.row-loading .span-loading{
+  position: fixed;
+  z-index: 10000000;
+  top:0;
+  left:0;
+  width: 300px;
+  height: 5px;
+  background-color: var(--color-container);
+  animation: load 2s linear infinite ;
+}
 /* ---------------------custom private scrollbar--------------------- */
 /* width */
 .all-user::-webkit-scrollbar {
@@ -602,6 +621,14 @@ ul {
   }
   100% {
     transform: translateX(0px);
+  }
+}
+@keyframes load{
+  0% {
+    transform: translateX(0vw);
+  }
+  100% {
+    transform: translateX(100vw);
   }
 }
 @keyframes rote-bg{

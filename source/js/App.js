@@ -80,7 +80,7 @@ let usersInApp = []
 let hasUser = false;
 const timeStart = document.querySelector('.time-start');
 const timeEnd = document.querySelector('.time-end');
-
+const loadingSpan=document.querySelector('.row-loading');
 const accountSignIn = document.querySelector(".account")
 const containerForm = document.querySelector(".branch-container");
 
@@ -271,8 +271,11 @@ const featureInfor = () => {
             avtview.src = inforCurrentUser.avt
         }
     })
+    
     formInfor.onsubmit = (e) => {
         e.preventDefault();
+        onLoadSpan()
+
         const user = auth.currentUser
         if (inputImg.files[0]) {
             addfile()
@@ -341,7 +344,7 @@ const featureInfor = () => {
                     displayName: nameInput.value, photoURL: photoURL,
                 })
                 exit.click()
-                success('Sửa thông tin thành công!')
+               
                 
                 async function repair() {
                     await getAllUser()
@@ -350,7 +353,10 @@ const featureInfor = () => {
                     signOut()
                 }
                 repair()
+                onLoadSpan()
+                success('Sửa thông tin thành công!')
             } catch (e) {
+                 onLoadSpan()
                 console.error("Error adding document: ", e);
                 fail("Sửa thông tin thất bại")
             }
@@ -443,6 +449,7 @@ function loginForm() {
 
     loginForm.addEventListener("submit", (e) => {
         e.preventDefault()
+        onLoadSpan()
         const email = loginForm.querySelector('#emailLogin').value;
         const password = loginForm.querySelector('#passLogin').value;
         signInWithEmailAndPassword(auth, email, password)
@@ -450,6 +457,7 @@ function loginForm() {
                 const user = userCredential.user;
                 handleUser(user)
                 // Signed in 
+                onLoadSpan()
                 success("Bạn đã đăng nhập tài khoản thành công.")
                 signIn = true;
                 setTimeout(() => {
@@ -460,6 +468,7 @@ function loginForm() {
 
             })
             .catch((e) => {
+                onLoadSpan()
                 fail("Đăng nhập không thành công!")
             });
     })
@@ -632,6 +641,7 @@ function registerForm() {
 
     // submit
     submitForm.addEventListener('click', (e) => {
+        onLoadSpan()
         const formEmail = document.querySelector('#emailRegister').value;
         const formPass = document.querySelector('#passRegister').value;
         const formName = document.querySelector('#name').value;
@@ -666,11 +676,13 @@ function registerForm() {
                 // create data base
 
                 if (picture) {
+                    onLoadSpan()
                     addfile()
                 }
                 else {
                     photoURL = img_preview ? img_preview.src : "https://ik.imagekit.io/TLIT/avt.png?ik-sdk-version=javascript-1.4.3&updatedAt=1668321852760";
                     addDocument(photoURL, user.uid);
+                    onLoadSpan()
                     success("Bạn đã đăng ký tài khoản thành công.")
                     updateThongTin()
                 }
@@ -764,6 +776,7 @@ function registerForm() {
             })
             .catch((error) => {
                 const errorCode = error.code;
+                onLoadSpan()
                 if (errorCode === "auth/email-already-in-use")
                     fail("Gmail đã được đăng kí trước đó.")
                 // ..
@@ -816,7 +829,14 @@ function signOut() {
 
 //--------------------------------------------------------------------------------
 //------------------------------------------------------------------------------
-
+function onLoadSpan(){
+    if(loadingSpan.classList.contains('d-block')){
+        loadingSpan.classList.remove('d-block');
+    }
+    else{
+        loadingSpan.classList.add('d-block');
+    }
+}
 
 timeStart.addEventListener('click', () => {
     timeStart.style.border = 'none';
@@ -834,9 +854,11 @@ const formCreate = document.querySelector('#createTime');
 formCreate.onsubmit = (e) => {
     e.preventDefault();
     if (signIn === true) {
+        onLoadSpan()
         renderRegister();
     }
     else {
+       
         fail("Bạn phải đăng nhập để tạo")
     }
 
@@ -853,22 +875,25 @@ function renderRegister() {
     let flag = true;
     if (timeStartText.trim() === '--:-- AM') {
         flag = false;
+    
         timeStart.style.border = '2px solid red';
     }
     if (timeEndText.trim() === '--:-- AM') {
         flag = false;
+     
         timeEnd.style.border = '2px solid red';
     }
 
     if (start == end) {
         flag = false;
+
         timeStart.style.border = '2px solid red';
         timeEnd.style.border = '2px solid red';
     }
     if (!flag) {
+        onLoadSpan()
         fail();
     } else {
-
 
         // push data
 
@@ -905,6 +930,7 @@ function renderRegister() {
                 for (let i = start - 1; i < end - 1; i++) {
                     if ((dataDate[findIndex].registerTime)[i] === true) {
                         flag = false;
+                        onLoadSpan()
                         timeStart.style.border = '2px solid red';
                         timeEnd.style.border = '2px solid red';
                         break;
@@ -957,6 +983,7 @@ function pushDay(data, registerTime) {
             if (idx === 2) {
                 dataDate.push(data);
             }
+            onLoadSpan()
             success();
         }
         catch (e) {
@@ -1005,7 +1032,6 @@ function pushDay(data, registerTime) {
 }
 // neu co data thi in trươc khi thao tác
 function preLoad() {
-    console.log('a')
     const allPopup = document.querySelectorAll('.popupTime')
     for (let i = 0; i < allPopup.length; i++) {
         allPopup[i].outerHTML = ""
