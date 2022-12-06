@@ -98,28 +98,33 @@ const db = getFirestore(app)
 const storage = getStorage();
 sessionStorage.setItem('firebase:authUser:AIzaSyCzjVkgJF4mxzUbBtNM6he0A20lvOpdg3k:[DEFAULT]', sessionStorage.getItem('baseUser'))
 
+// lắng nghe database
+const unsubscribe = onSnapshot(collection(db, `${date.getFullYear()}`), (snapshot)=>{
+    GetYearDate();
+},(e)=>console.log(e));
+
 
 setPersistence(auth, browserSessionPersistence)
-    .then(() => {
-        // Existing and future Auth states are now persisted in the current
-        // session only. Closing the window would clear any existing state even
-        // if a user forgets to sign out.
-        // ...
-        async function get(){
-            await getAllUser()
-            if (auth.currentUser) {
-                handleUser(auth.currentUser)
-                signIn = true;
-            }
-        }
-        get()
-       
-        // New sign-in will be persisted with session persistence.
-    })
-    .catch(() => {
-        getAllUser()
+.then(() => {
+    // Existing and future Auth states are now persisted in the current
+    // session only. Closing the window would clear any existing state even
+    // if a user forgets to sign out.
+    // ...
 
-    });
+    async function get(){
+        await getAllUser()
+        if (auth.currentUser) {
+            handleUser(auth.currentUser)
+            signIn = true;
+        }
+    }
+    get()
+   
+    // New sign-in will be persisted with session persistence.
+})
+.catch(() => {
+    getAllUser()
+});
 function renderUser(user){
     const html = `
     <img style="width: 50px;
@@ -277,7 +282,6 @@ const featureInfor = () => {
             };
             // 'file' comes from the Blob or File API
             const uploadTask = uploadBytesResumable(storageRef, picture, metadata);
-
             // Listen for state changes, errors, and completion of the upload.
             uploadTask.on('state_changed',
                 (snapshot) => {
@@ -360,10 +364,7 @@ async function GetYearDate() {
     preLoad()
 }
 
-// lắng nghe  thay đổi database
-onSnapshot(collection(db, `${date.getFullYear()}`), (snapshot) => {
-    GetYearDate()
-});
+
 
 accountSignIn.addEventListener('click', () => {
     if (signIn === false) {
@@ -993,7 +994,6 @@ function pushDay(data, registerTime) {
         })
         addDocument(dataDay, 2)
     }
-    // preLoad()
 }
 // neu co data thi in trươc khi thao tác
 function preLoad() {
