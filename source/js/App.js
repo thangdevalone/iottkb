@@ -77,6 +77,7 @@ let nowYear = date.getFullYear();
 let signIn = false;
 let inforCurrentUser = {};
 let usersInApp = []
+let hasUser = false;
 const timeStart = document.querySelector('.time-start');
 const timeEnd = document.querySelector('.time-end');
 
@@ -99,32 +100,25 @@ const storage = getStorage();
 sessionStorage.setItem('firebase:authUser:AIzaSyCzjVkgJF4mxzUbBtNM6he0A20lvOpdg3k:[DEFAULT]', sessionStorage.getItem('baseUser'))
 
 // lắng nghe database
-const unsubscribe = onSnapshot(collection(db, `${date.getFullYear()}`), (snapshot)=>{
-    GetYearDate();
-},(e)=>console.log(e));
-
-
-setPersistence(auth, browserSessionPersistence)
-.then(() => {
-    // Existing and future Auth states are now persisted in the current
-    // session only. Closing the window would clear any existing state even
-    // if a user forgets to sign out.
-    // ...
-
-    async function get(){
-        await getAllUser()
+async function firstIn(){
+    await getAllUser()
+    const unsubscribe = onSnapshot(collection(db, `${date.getFullYear()}`), ()=>GetYearDate(),(e)=>console.log(e));
+    setPersistence(auth, browserSessionPersistence)
+    .then(() => {
+        // Existing and future Auth states are now persisted in the current
+        // session only. Closing the window would clear any existing state even
+        // if a user forgets to sign out.
+        // ...
         if (auth.currentUser) {
             handleUser(auth.currentUser)
             signIn = true;
         }
-    }
-    get()
-   
-    // New sign-in will be persisted with session persistence.
-})
-.catch(() => {
-    getAllUser()
-});
+        // New sign-in will be persisted with session persistence.
+    })
+    .catch(() => {
+    });
+}
+firstIn()
 function renderUser(user){
     const html = `
     <img style="width: 50px;
@@ -159,11 +153,13 @@ function handleUser(user) {
     signOut()
 }
 async function getAllUser(){
+
     usersInApp = []
     const querrySnapshot = await getDocs(collection(db, "users"));
     querrySnapshot.forEach(doc => {
         usersInApp.push(doc.data());
     })
+    hasUser=true;
     renderFullUser()
 
 }
@@ -357,11 +353,15 @@ const featureInfor = () => {
 // update DateDate
 async function GetYearDate() {
     dataDate = []
+    const x=[]
     const querrySnapshot = await getDocs(collection(db, `${date.getFullYear()}`));
     querrySnapshot.forEach(doc => {
-        dataDate.push(doc.data());
+        x.push(doc.data());
     })
-    preLoad()
+    dataDate=[...x]
+    if(hasUser){
+        preLoad()
+    }
 }
 
 
@@ -997,6 +997,7 @@ function pushDay(data, registerTime) {
 }
 // neu co data thi in trươc khi thao tác
 function preLoad() {
+    console.log(usersInApp,dataDate)
     const allPopup = document.querySelectorAll('.popupTime')
     for(let i = 0; i < allPopup.length; i++){
         allPopup[i].outerHTML=""
@@ -1103,7 +1104,6 @@ nxtBtn.onclick = () => {
     else {
         GetYearDate();
         nowYear = date.getFullYear();
-
     }
 
 }
@@ -1115,6 +1115,8 @@ btnToday.onclick = () => {
     else {
         GetYearDate();
         nowYear = date.getFullYear();
+        preLoad()
+
 
     }
 
@@ -1128,6 +1130,7 @@ cal_days.onclick = (e) => {
         else {
             GetYearDate();
             nowYear = date.getFullYear();
+            preLoad()
         }
 
     }
