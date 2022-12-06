@@ -99,27 +99,36 @@ const db = getFirestore(app)
 const storage = getStorage();
 sessionStorage.setItem('firebase:authUser:AIzaSyCzjVkgJF4mxzUbBtNM6he0A20lvOpdg3k:[DEFAULT]', sessionStorage.getItem('baseUser'))
 
-// lắng nghe database
-async function firstIn(){
+async function firstIn() {
     await getAllUser()
-    const unsubscribe = onSnapshot(collection(db, `${date.getFullYear()}`), ()=>GetYearDate(),(e)=>console.log(e));
+
     setPersistence(auth, browserSessionPersistence)
-    .then(() => {
-        // Existing and future Auth states are now persisted in the current
-        // session only. Closing the window would clear any existing state even
-        // if a user forgets to sign out.
-        // ...
-        if (auth.currentUser) {
-            handleUser(auth.currentUser)
-            signIn = true;
-        }
-        // New sign-in will be persisted with session persistence.
-    })
-    .catch(() => {
-    });
+        .then(() => {
+            // Existing and future Auth states are now persisted in the current
+            // session only. Closing the window would clear any existing state even
+            // if a user forgets to sign out.
+            // ...
+            if (auth.currentUser) {
+                handleUser(auth.currentUser)
+                signIn = true;
+            }
+            // New sign-in will be persisted with session persistence.
+        })
+        .catch(() => {
+        });
+    
 }
-firstIn()
-function renderUser(user){
+firstIn().then(()=>{
+    // lắng nghe database
+    const unsubscribe2 = onSnapshot(collection(db, `users`), ()=>reRenderApp());
+    const unsubscribe = onSnapshot(collection(db, `${date.getFullYear()}`), () => GetYearDate(), (e) => console.log(e));
+
+})
+async function reRenderApp(){
+    await getAllUser();
+    preLoad()
+}
+function renderUser(user) {
     const html = `
     <img style="width: 50px;
                 height: 50px;
@@ -152,21 +161,23 @@ function handleUser(user) {
     handleFeatures()
     signOut()
 }
-async function getAllUser(){
+async function getAllUser() {
 
     usersInApp = []
+    const x=[]
     const querrySnapshot = await getDocs(collection(db, "users"));
     querrySnapshot.forEach(doc => {
-        usersInApp.push(doc.data());
+        x.push(doc.data());
     })
-    hasUser=true;
+    usersInApp=[...x]
+    hasUser = true;
     renderFullUser()
 
 }
 
-function renderFullUser(){
-    const fullUserBox=document.querySelector('.all-user ul');
-    const html= usersInApp.map((user,idx)=>{
+function renderFullUser() {
+    const fullUserBox = document.querySelector('.all-user ul');
+    const html = usersInApp.map((user, idx) => {
         return `
         <li class="pd-10 cursor-pointer feature feature-flex username-app" class="feature" id="user${idx}">
         <div><img class="all-user_avt" src=${user.avt} alt="avt"></div>
@@ -176,7 +187,7 @@ function renderFullUser(){
         </li>
         `
     })
-    fullUserBox.innerHTML=html.join('');
+    fullUserBox.innerHTML = html.join('');
 }
 const handleFeatures = () => {
     document.getElementById('logUserInfor').addEventListener('click', () => { featureInfor() });
@@ -216,9 +227,9 @@ const featureInfor = () => {
     const emailInput = formInfor.querySelector('#email')
     const adminInput = formInfor.querySelector('#admin')
     const stdInput = formInfor.querySelector('#sdt')
-    const avtview= formInfor.querySelector('#avt-preview')
-    const inputImg=formInfor.querySelector('#avt-file')
-    avtview.src=inforCurrentUser.avt
+    const avtview = formInfor.querySelector('#avt-preview')
+    const inputImg = formInfor.querySelector('#avt-file')
+    avtview.src = inforCurrentUser.avt
     nameInput.value = inforCurrentUser.name
     idgvInput.value = inforCurrentUser.mgv
     emailInput.value = inforCurrentUser.email
@@ -252,17 +263,17 @@ const featureInfor = () => {
                 const image = new Image();
                 image.src = e.target.result;
                 image.onload = () => {
-                    avtview.src=image.src
+                    avtview.src = image.src
                 }
             }
         }
-        else{
-            avtview.src=inforCurrentUser.avt
+        else {
+            avtview.src = inforCurrentUser.avt
         }
     })
-    formInfor.onsubmit=(e)=>{
+    formInfor.onsubmit = (e) => {
         e.preventDefault();
-        const user=auth.currentUser
+        const user = auth.currentUser
         if (inputImg.files[0]) {
             addfile()
         }
@@ -271,7 +282,7 @@ const featureInfor = () => {
             repairDocument()
         }
         function addfile() {
-            const picture=inputImg.files[0]
+            const picture = inputImg.files[0]
             const storageRef = ref(storage, 'users/' + user.uid + '/profile.' + picture.type.slice((picture.type).indexOf('/') + 1));
             const metadata = {
                 contentType: picture.type,
@@ -323,20 +334,20 @@ const featureInfor = () => {
             );
         }
         async function repairDocument() {
-            inforCurrentUser={...inforCurrentUser,mgv:idgvInput.value,phoneNumber:stdInput.value,name:nameInput.value,avt:photoURL}
+            inforCurrentUser = { ...inforCurrentUser, mgv: idgvInput.value, phoneNumber: stdInput.value, name: nameInput.value, avt: photoURL }
             try {
-                const docRef = await setDoc(doc(db, "users", `${inforCurrentUser.userID}`),inforCurrentUser);
+                const docRef = await setDoc(doc(db, "users", `${inforCurrentUser.userID}`), inforCurrentUser);
                 await updateProfile(user, {
                     displayName: nameInput.value, photoURL: photoURL,
                 })
                 exit.click()
                 success('Sửa thông tin thành công!')
-                async function repair(){
+                
+                async function repair() {
                     await getAllUser()
                     accountSignIn.innerHTML = renderUser(user)
                     handleFeatures()
                     signOut()
-                    preLoad()
                 }
                 repair()
             } catch (e) {
@@ -344,7 +355,7 @@ const featureInfor = () => {
                 fail("Sửa thông tin thất bại")
             }
         }
-       
+
     }
 }
 
@@ -353,22 +364,19 @@ const featureInfor = () => {
 // update DateDate
 async function GetYearDate() {
     dataDate = []
-    const x=[]
+    const x = []
     const querrySnapshot = await getDocs(collection(db, `${date.getFullYear()}`));
     querrySnapshot.forEach(doc => {
         x.push(doc.data());
     })
-    dataDate=[...x]
-    if(hasUser){
-        preLoad()
-    }
+    dataDate = [...x]
+    preLoad()
 }
-
-
 
 accountSignIn.addEventListener('click', () => {
     if (signIn === false) {
         containerForm.style.display = "flex";
+       
         loginForm()
     }
 })
@@ -446,7 +454,7 @@ function loginForm() {
                 signIn = true;
                 setTimeout(() => {
                     containerForm.style.display = "none"
-                    containerForm.innerHTML =""
+                    containerForm.innerHTML = ""
                     sessionStorage.setItem('baseUser', sessionStorage.getItem('firebase:authUser:AIzaSyCzjVkgJF4mxzUbBtNM6he0A20lvOpdg3k:[DEFAULT]'))
                 }, 500)
 
@@ -641,7 +649,7 @@ function registerForm() {
                     mgv: formIdgv,
                     color: colorPicker,
                     avt: img,
-                    phoneNumber:"",
+                    phoneNumber: "",
                     email: formEmail,
                     isAdmin: false
                 });
@@ -997,10 +1005,10 @@ function pushDay(data, registerTime) {
 }
 // neu co data thi in trươc khi thao tác
 function preLoad() {
-    console.log(usersInApp,dataDate)
+    console.log('a')
     const allPopup = document.querySelectorAll('.popupTime')
-    for(let i = 0; i < allPopup.length; i++){
-        allPopup[i].outerHTML=""
+    for (let i = 0; i < allPopup.length; i++) {
+        allPopup[i].outerHTML = ""
     }
     //đang ở view ngày
     if (where == 1) {
@@ -1060,7 +1068,9 @@ function preLoad() {
 
 // render ra popup
 function renderPopupTime(data, index = -1, array = []) {
-    const author=(usersInApp.filter(x=>x.userID===data.author))[0].name
+
+    const author = (usersInApp.filter(x => x.userID === data.author))[0].name
+    
     if (where == 1) {
         const timeTable = document.querySelector('.time-table');
 
