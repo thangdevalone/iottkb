@@ -275,7 +275,6 @@ const featureInfor = () => {
     formInfor.onsubmit = (e) => {
         e.preventDefault();
         onLoadSpan()
-
         const user = auth.currentUser
         if (inputImg.files[0]) {
             addfile()
@@ -985,6 +984,7 @@ function pushDay(data, registerTime) {
             }
             onLoadSpan()
             success();
+            preLoad();
         }
         catch (e) {
             console.log(e)
@@ -1130,6 +1130,7 @@ prevBtn.onclick = () => {
         GetYearDate();
         nowYear = date.getFullYear();
     }
+    console.log(nowYear)
 }
 nxtBtn.onclick = () => {
     animTab(where);
@@ -1139,8 +1140,9 @@ nxtBtn.onclick = () => {
     }
     else {
         GetYearDate();
-        nowYear = date.getFullYear();
     }
+    console.log(nowYear)
+
 
 }
 btnToday.onclick = () => {
