@@ -10,8 +10,9 @@ import {
     getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, GoogleAuthProvider,
     updateProfile, updateEmail, setPersistence, browserSessionPersistence,
 } from "https://www.gstatic.com/firebasejs/9.13.0/firebase-auth.js";
-import { getFirestore, collection, doc, setDoc, addDoc, getDocs, onSnapshot } from "https://www.gstatic.com/firebasejs/9.13.0/firebase-firestore.js";
+import { getFirestore, collection, doc, setDoc, updateDoc,getDoc,addDoc, getDocs, onSnapshot } from "https://www.gstatic.com/firebasejs/9.13.0/firebase-firestore.js";
 import { getStorage, ref, uploadBytesResumable, getDownloadURL } from "https://www.gstatic.com/firebasejs/9.13.0/firebase-storage.js";
+import htmls from "./html.js";
 
 // TODO: Add SDKs for Firebase products that you want to use
 // https://firebase.google.com/docs/web/setup#available-libraries
@@ -101,7 +102,6 @@ sessionStorage.setItem('firebase:authUser:AIzaSyCzjVkgJF4mxzUbBtNM6he0A20lvOpdg3
 
 async function firstIn() {
     await getAllUser()
-
     setPersistence(auth, browserSessionPersistence)
         .then(() => {
             // Existing and future Auth states are now persisted in the current
@@ -460,6 +460,7 @@ function loginForm() {
                 success("Bạn đã đăng nhập tài khoản thành công.")
                 signIn = true;
                 setTimeout(() => {
+                    preLoad()
                     containerForm.style.display = "none"
                     containerForm.innerHTML = ""
                     sessionStorage.setItem('baseUser', sessionStorage.getItem('firebase:authUser:AIzaSyCzjVkgJF4mxzUbBtNM6he0A20lvOpdg3k:[DEFAULT]'))
@@ -798,6 +799,8 @@ function signOut() {
             signIn = false;
             sessionStorage.removeItem('baseUser');
             accountSignIn.innerHTML = `<span  class="account-name btn btn-outline-primary btn-signIn ">Đăng nhập</span>`
+            inforCurrentUser={}
+            preLoad()
         })
             .catch(() => {
                 fail('Đăng xuất thất bại! Thử lại sau')
@@ -862,7 +865,16 @@ formCreate.onsubmit = (e) => {
     }
 
 }
+function generateString(length) {
+    const characters ='ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+    let result = ' ';
+    const charactersLength = characters.length;
+    for ( let i = 0; i < length; i++ ) {
+        result += characters.charAt(Math.floor(Math.random() * charactersLength));
+    }
 
+    return result;
+}
 function renderRegister() {
     const headerText = document.querySelector('#title-form').value;
     const bodyText = document.querySelector('#description-form').value;
@@ -889,6 +901,7 @@ function renderRegister() {
         timeStart.style.border = '2px solid red';
         timeEnd.style.border = '2px solid red';
     }
+
     if (!flag) {
         onLoadSpan()
         fail();
@@ -898,20 +911,20 @@ function renderRegister() {
 
         if (timeStartText.trim() !== '--:-- AM' && timeEndText.trim() !== '--:-- AM') {
 
-
             if (start > end) {
                 [timeEndText, timeStartText] = [timeStartText, timeEndText];
                 [start, end] = [end, start];
-
             }
             const length = -start + end
             // data đăng kí
             const data = {
+                idData:generateString(20),
                 author: inforCurrentUser.userID,
                 title: headerText !== '' ? headerText : 'No title',
                 bodyTitle: bodyText !== '' ? bodyText : 'No Description',
                 timeStart: timeStartText,
                 timeEnd: timeEndText,
+                capacity:[start-1,end-2],
                 lengthDiv: length * height - 5 + 'px',
                 pos: (start - 1) * height + 'px',
                 color: colorUser
@@ -1037,7 +1050,7 @@ function preLoad() {
         allPopup[i].outerHTML = ""
     }
     //đang ở view ngày
-    if (where == 1) {
+    if (where == 1) {    
         const dayCheck = cal_days.querySelector(".active");
         const day = dayCheck !== null ? Number(dayCheck.innerHTML) : date.getDate();
         const findIndex = dataDate.findIndex(x => (x.id_month == date.getMonth() + 1 && x.date == day));
@@ -1047,6 +1060,8 @@ function preLoad() {
                 renderPopupTime(arrayData[i]);
             }
         }
+        listenRepairPopUp()
+
     }
     // đang ở view tuần 
     if (where == 2) {
@@ -1091,8 +1106,138 @@ function preLoad() {
         }
     }
 }
+const repairPopUp=(id)=>{
+    return `
+        <div id="${id}" class="repairPopUp-container">
+            <div id="${id}" class="edit-container cursor-pointer repair-item">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M11 2H9C4 2 2 4 2 9V15C2 20 4 22 9 22H15C20 22 22 20 22 15V13" stroke="#292D32" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                    <path d="M16.04 3.02001L8.16 10.9C7.86 11.2 7.56 11.79 7.5 12.22L7.07 15.23C6.91 16.32 7.68 17.08 8.77 16.93L11.78 16.5C12.2 16.44 12.79 16.14 13.1 15.84L20.98 7.96001C22.34 6.60001 22.98 5.02001 20.98 3.02001C18.98 1.02001 17.4 1.66001 16.04 3.02001Z" stroke="#292D32" stroke-width="1.5" stroke-miterlimit="10" stroke-linecap="round" stroke-linejoin="round"/>
+                    <path d="M14.91 4.1499C15.58 6.5399 17.45 8.4099 19.85 9.0899" stroke="#292D32" stroke-width="1.5" stroke-miterlimit="10" stroke-linecap="round" stroke-linejoin="round"/>
+                </svg>
+            </div>
+            <div id="${id}" class="delete-container cursor-pointer repair-item">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M8.81 2L5.19 5.63" stroke="#292D32" stroke-width="1.5" stroke-miterlimit="10" stroke-linecap="round" stroke-linejoin="round"/>
+                    <path d="M15.19 2L18.81 5.63" stroke="#292D32" stroke-width="1.5" stroke-miterlimit="10" stroke-linecap="round" stroke-linejoin="round"/>
+                    <path d="M2 7.84998C2 5.99998 2.99 5.84998 4.22 5.84998H19.78C21.01 5.84998 22 5.99998 22 7.84998C22 9.99998 21.01 9.84998 19.78 9.84998H4.22C2.99 9.84998 2 9.99998 2 7.84998Z" stroke="#292D32" stroke-width="1.5"/>
+                    <path d="M9.76001 14V17.55" stroke="#292D32" stroke-width="1.5" stroke-linecap="round"/>
+                    <path d="M14.36 14V17.55" stroke="#292D32" stroke-width="1.5" stroke-linecap="round"/>
+                    <path d="M3.5 10L4.91 18.64C5.23 20.58 6 22 8.86 22H14.89C18 22 18.46 20.64 18.82 18.76L20.5 10" stroke="#292D32" stroke-width="1.5" stroke-linecap="round"/>
+                </svg>
+            </div>
+        </div>
+    `
+}
+function listenRepairPopUp(){
+    const allRepairTools=document.querySelectorAll('.repairPopUp-container')
+    allRepairTools.forEach((item) => {
+        item.addEventListener('click',(e)=>{
+            const target=e.target
+            if(target.closest('.edit-container')){
+                const element=target.closest('.edit-container')
+                editPopUp(element)
+            }
+            if(target.closest('.delete-container')){
+                const element=target.closest('.delete-container')
+                delPopUp(element)
+            }
+        })
+    })
+}
+
+const editPopUp=(e)=>{
+    console.log(e)
+    console.log(`bạn đang edit ${e.id}`)
+}
+const delPopUp=(e)=>{
+    const id_del=e.id
+    console.log(`bạn đang delete ${e.id}`)
+    const modal = document.querySelector('.modal-features')
+    modal.style.display = "flex";
+    modal.classList.add('on')
+    modal.innerHTML = htmls.modalDel
+    const exit = modal.querySelector('.exit-feature')
+    exit.onclick = () => {
+        modal.style.display = "none";
+        modal.classList.remove('on')
+        modal.innerHTML = ""
+    }
+    const noBtn=document.querySelector('.choose-no')
+    const yesBtn=document.querySelector('.choose-yes')
+    noBtn.onclick = ()=>{
+        exit.click()
+    }
+    document.onclick = (e) => {
+
+        if (e.target.classList.contains('modal-features')) {
+            exit.click()
+        }
+    }
+    yesBtn.onclick = ()=>{
+        onLoadSpan()
+        const dayCheck = cal_days.querySelector(".active");
+        const day = dayCheck !== null ? Number(dayCheck.innerHTML) : date.getDate();
+        async function getData(){
+            const docSnap = await getDoc(doc(db, `${date.getFullYear()}`, `${day}-${date.getMonth()+1}-${date.getFullYear()}`));
+            return docSnap.data(); 
+        }
+        async function editData(){
+            const data= await getData()
+            const dataList=[...data.data];
+            const findData=dataList.filter(x=>{console.log(x.idData,id_del);return x.idData===id_del})[0]
+            const capacity=[...findData.capacity]
+            
+            const newRegisterTime=data.registerTime.map((x,idx)=>{
+                if(capacity.findIndex(x=>x===idx)!==-1){
+                    return !x;
+                }
+                else{
+                    return x;
+                }
+            })
+            const newData=dataList.filter(x=>{return x.idData!==id_del})
+            const newAuthors=[];
+            newData.forEach(data=>{
+                newAuthors.findIndex(x => x.author === data.author) === -1 ? newAuthors.push({
+                    author: data.author,
+                    color: data.color
+                }) : () => { return false; }
+            })
+            
+            newData.forEach(x=>{
+                if(newAuthors.forEach(item=>item))
+                newAuthors.push({
+                    author:x.author,
+                    color:x.color
+
+                })
+            })
+            const resuilt={...data,data:newData,registerTime:newRegisterTime,authors:newAuthors}
+            return resuilt;
+            
+        }
+        async function pushData(){
+            const data=await editData();
+            console.log(data)
+            await updateDoc(doc(db, `${date.getFullYear()}`, `${day}-${date.getMonth()+1}-${date.getFullYear()}`), data);
+            onLoadSpan()
+            exit.click()
+        }
+        pushData()
+        .then(()=>{
+            success('Xóa thành công!')
+        })
+        .catch((e)=>{
+            fail('Xóa không thành công!')
+        })
+       
+    }
+}
+
 
 // render ra popup
+
 function renderPopupTime(data, index = -1, array = []) {
 
     const author = (usersInApp.filter(x => x.userID === data.author))[0].name
@@ -1101,11 +1246,13 @@ function renderPopupTime(data, index = -1, array = []) {
         const timeTable = document.querySelector('.time-table');
 
         const popupTime = `
-        <div class="popupTime" style="position: absolute; height:${data.lengthDiv}; top:${data.pos};  background-color: ${data.color};">
+        <div class="popupTime" id="${data.idData}" style="position: absolute; height:${data.lengthDiv}; top:${data.pos};  background-color: ${data.color};">
             <span class="headerPopupTimes">${data.title} | ${data.timeStart} <i class="fa-solid fa-minus"></i> ${data.timeEnd} | ${author} </span> 
             <div class="bodyPopupTimes">Des: ${data.bodyTitle}</div>
+            ${data.author===inforCurrentUser.userID ? repairPopUp(data.idData):''}
         </div>
         `
+
         timeTable.innerHTML = popupTime + timeTable.innerHTML;
     }
     if (where == 2) {
@@ -1141,7 +1288,6 @@ nxtBtn.onclick = () => {
     else {
         GetYearDate();
     }
-    console.log(nowYear)
 
 
 }

@@ -430,10 +430,27 @@ const month = `
 
                 </div>
 `
+const modalDel=`
+<div class="modal sure-event">
+<div class="modal-header ">
+  <span class="exit-feature cursor-pointer"><i class="fa-solid fa-xmark"></i></span>
+</div>
+<h4 class="text-center  mt-2 mb-3" >Are you sure?</h4>
+<div class="modal-body" id="sure">
+    Bạn có chắc muốn xóa khoảng thời gian này không?
+</div>
+<div class="modal-footer">
+    <button class="btn btn-secondary choose-no">Chờ chút!</button>
+    <button class="btn btn-primary choose-yes">Vâng!</button>
+
+</div>
+</div>
+`
 const htmls = {
     day: day,
     week: week,
     base: baseTable,
-    month: month
+    month: month,
+    modalDel:modalDel
 }
 export default htmls

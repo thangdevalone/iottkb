@@ -578,6 +578,24 @@ ul {
   background-color: var(--color-container);
   animation: load 2s linear infinite ;
 }
+.repairPopUp-container{
+  display: flex;
+  position: absolute;
+  right: 25px;
+  top:10px;
+}
+
+.repair-item{
+  padding:5px;
+  border-radius:10px;
+  transition: all 0.25s;
+}
+.repair-item:hover{
+  background-color: rgba(106,106,106,0.5);
+}
+.repair-item:hover path{
+  stroke: rgb(235, 234, 234);
+}
 /* ---------------------custom private scrollbar--------------------- */
 /* width */
 .all-user::-webkit-scrollbar {
