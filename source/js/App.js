@@ -969,6 +969,10 @@ function renderRegister() {
                     }
                     pushDay(data, registerTime)
                 }
+                document.querySelector('#title-form').value="";
+                document.querySelector('#description-form').value="";
+                timeStart.innerHTML="--:-- AM"
+                timeEnd.innerHTML="--:-- AM"
             }
             else {
                 warning();
@@ -982,6 +986,7 @@ function renderRegister() {
 
 
 function pushDay(data, registerTime) {
+    
     const dayCheck = cal_days.querySelector(".active");
     const day = dayCheck !== null ? Number(dayCheck.innerHTML) : date.getDate();
     const dayIndex = dayCheck !== null ? dayCheck.dataset.index : sevenDays[date.getDay()]
@@ -1041,6 +1046,7 @@ function pushDay(data, registerTime) {
 
         })
         addDocument(dataDay, 2)
+        
     }
 }
 // neu co data thi in trươc khi thao tác
@@ -1146,13 +1152,109 @@ function listenRepairPopUp(){
     })
 }
 
-const editPopUp=(e)=>{
-    console.log(e)
-    console.log(`bạn đang edit ${e.id}`)
+const editPopUp=async (e)=>{
+    const sDays=[
+        'Chủ nhật',
+        'Thứ hai',
+        'Thứ ba',
+        'Thứ tư',
+        'Thứ năm',
+        'Thứ sáu',
+        'Thứ bảy',
+
+    ]
+    const dayCheck = cal_days.querySelector(".active");
+    const day = dayCheck !== null ? Number(dayCheck.innerHTML) : date.getDate();
+    const dayIndex = dayCheck !== null ? getThu(dayCheck.dataset.index) : sDays[date.getDay()]
+    onLoadSpan()
+    const data= await getData();
+    onLoadSpan()
+    
+    const id_edit=e.id;
+    const modal = document.querySelector('.modal-features')
+    modal.style.display = "flex";
+    modal.classList.add('on')
+    modal.innerHTML = htmls.modalEdit
+    const exit = modal.querySelector('.exit-feature')
+    exit.onclick = () => {
+        modal.style.display = "none";
+        modal.classList.remove('on')
+        modal.innerHTML = ""
+    }
+    document.onclick = (e) => {
+        if (e.target.classList.contains('modal-features')) {
+            exit.click();
+        }
+    }
+    const getThu=(data)=>{
+        const idx=Number(data[-1])
+        if(idx){
+            return sDays[idx-1]
+        }
+        else{
+            return sDays[0]
+        }
+    }
+
+
+   
+    
+    async function getData(){
+        const docSnap = await getDoc(doc(db, `${date.getFullYear()}`, `${day}-${date.getMonth()+1}-${date.getFullYear()}`));
+        return docSnap.data(); 
+    }
+    document.querySelector('.update-event .thu-ngay-thang').innerHTML=`${dayIndex}, ${day} Tháng ${date.getMonth()+1}`
+    const title=document.querySelector('.update-event #title-form');
+    const timeStart=document.querySelector('.update-event .time-start');
+    const timeEnd=document.querySelector('.update-event .time-end');
+    const timeTable=document.querySelector('.update-event .timing-table');
+    const descripion=document.querySelector('.update-event #description-form');
+    const btnUpdate=document.querySelector('.update-event .btn-update');
+    timeEnd.style.pointerEvents="none";
+    timeStart.style.pointerEvents="none";
+
+    document.addEventListener('click', () => {
+            timeTable.classList.remove('d-block');
+    })
+    const dataList=[...data.data];
+    const findData=dataList.filter(x=>{return x.idData===id_edit})[0]
+    console.log(findData,dataList,id_edit)
+    title.innerHTML=findData.title;
+    descripion.innerHTML=findData.bodyTitle;
+    timeStart.innerHTML=findData.timeStart;
+    timeEnd.innerHTML=findData.timeEnd;
+    async function pushData(){
+        const newData=dataList.map((item)=>{
+            if(item.idData===id_edit){
+                console.log('go')
+                return {...findData,title:title.value,bodyTitle:descripion.value}
+            }
+            else{
+                return item
+            }
+        })
+
+        const resuilt={...data,data:newData}
+        await updateDoc(doc(db, `${date.getFullYear()}`, `${day}-${date.getMonth()+1}-${date.getFullYear()}`), resuilt);
+        onLoadSpan()
+        preLoad()
+        exit.click()
+
+    }
+    btnUpdate.onclick=(e)=>{
+        e.preventDefault()
+        onLoadSpan()
+        pushData()
+        .then(()=>{
+            success('Sửa thành công!')
+        })
+        .catch((e)=>{
+            fail('Sửa không thành công!')
+        })
+    }
 }
 const delPopUp=(e)=>{
     const id_del=e.id
-    console.log(`bạn đang delete ${e.id}`)
     const modal = document.querySelector('.modal-features')
     modal.style.display = "flex";
     modal.classList.add('on')
@@ -1185,7 +1287,7 @@ const delPopUp=(e)=>{
         async function editData(){
             const data= await getData()
             const dataList=[...data.data];
-            const findData=dataList.filter(x=>{console.log(x.idData,id_del);return x.idData===id_del})[0]
+            const findData=dataList.filter(x=>{return x.idData===id_del})[0]
             const capacity=[...findData.capacity]
             
             const newRegisterTime=data.registerTime.map((x,idx)=>{
@@ -1219,7 +1321,6 @@ const delPopUp=(e)=>{
         }
         async function pushData(){
             const data=await editData();
-            console.log(data)
             await updateDoc(doc(db, `${date.getFullYear()}`, `${day}-${date.getMonth()+1}-${date.getFullYear()}`), data);
             onLoadSpan()
             exit.click()

@@ -42,6 +42,12 @@
     width: 70%;
     height: 75%;
 }
+.modal-features .update-event{
+    display: block;
+    animation: none;
+    width: 500px;
+    height: 65%;
+}
 .modal-features .sure-event{
     display: block;
     animation: none;
