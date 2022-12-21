@@ -10,7 +10,7 @@ import {
     getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, GoogleAuthProvider,
     updateProfile, updateEmail, setPersistence, browserSessionPersistence,
 } from "https://www.gstatic.com/firebasejs/9.13.0/firebase-auth.js";
-import { getFirestore, collection, doc, setDoc, updateDoc,getDoc,addDoc, getDocs, onSnapshot } from "https://www.gstatic.com/firebasejs/9.13.0/firebase-firestore.js";
+import { getFirestore, collection, doc, setDoc, updateDoc, getDoc, addDoc, getDocs, onSnapshot } from "https://www.gstatic.com/firebasejs/9.13.0/firebase-firestore.js";
 import { getStorage, ref, uploadBytesResumable, getDownloadURL } from "https://www.gstatic.com/firebasejs/9.13.0/firebase-storage.js";
 import htmls from "./html.js";
 
@@ -81,7 +81,7 @@ let usersInApp = []
 let hasUser = false;
 const timeStart = document.querySelector('.time-start');
 const timeEnd = document.querySelector('.time-end');
-const loadingSpan=document.querySelector('.row-loading');
+const loadingSpan = document.querySelector('.row-loading');
 const accountSignIn = document.querySelector(".account")
 const containerForm = document.querySelector(".branch-container");
 
@@ -116,15 +116,15 @@ async function firstIn() {
         })
         .catch(() => {
         });
-    
+
 }
-firstIn().then(()=>{
+firstIn().then(() => {
     // lắng nghe database
-    const unsubscribe2 = onSnapshot(collection(db, `users`), ()=>reRenderApp());
+    const unsubscribe2 = onSnapshot(collection(db, `users`), () => reRenderApp());
     const unsubscribe = onSnapshot(collection(db, `${date.getFullYear()}`), () => GetYearDate(), (e) => console.log(e));
 
 })
-async function reRenderApp(){
+async function reRenderApp() {
     await getAllUser();
     preLoad()
 }
@@ -164,12 +164,12 @@ function handleUser(user) {
 async function getAllUser() {
 
     usersInApp = []
-    const x=[]
+    const x = []
     const querrySnapshot = await getDocs(collection(db, "users"));
     querrySnapshot.forEach(doc => {
         x.push(doc.data());
     })
-    usersInApp=[...x]
+    usersInApp = [...x]
     hasUser = true;
     renderFullUser()
 
@@ -191,8 +191,13 @@ function renderFullUser() {
 }
 const handleFeatures = () => {
     document.getElementById('logUserInfor').addEventListener('click', () => { featureInfor() });
-    document.getElementById('logDataWareHouse').addEventListener('click', () => { });
-    document.getElementById('logDataAnalystics').addEventListener('click', () => { });
+    document.getElementById('logDataWareHouse').addEventListener('click', async () => {
+        onLoadSpan()
+        const docSnap = await getDoc(doc(db, `data`, `${inforCurrentUser.userID}`));
+        onLoadSpan()
+        dataWareHouse(docSnap.data())
+    });
+    document.getElementById('logDataAnalystics').addEventListener('click', () => { dataAnalystic() });
     document.getElementById('logCreateAccount')?.addEventListener('click', () => {
         containerForm.style.display = "flex";
         containerForm.innerHTML = form.register;
@@ -200,8 +205,125 @@ const handleFeatures = () => {
     });
 
 }
+const dataAnalystic = async () => {
+    console.log("Bạn đang muốn phân tích dữ liệu")
+    const modal = document.querySelector('.modal-features')
+    modal.style.display = "flex";
+    modal.classList.add('on')
+    modal.innerHTML = features.feature_chart
+    const exit = modal.querySelector('.exit-feature')
+    exit.onclick = () => {
+        modal.style.display = "none";
+        modal.classList.remove('on')
+        modal.innerHTML = ""
+    }
+    const baseData = [
+        { thang: 'Tháng 1', count: 0 },
+        { thang: 'Tháng 2', count: 0 },
+        { thang: 'Tháng 3', count: 0 },
+        { thang: 'Tháng 4', count: 0 },
+        { thang: 'Tháng 5', count: 0 },
+        { thang: 'Tháng 6', count: 0 },
+        { thang: 'Tháng 7', count: 0 },
+        { thang: 'Tháng 8', count: 0 },
+        { thang: 'Tháng 9', count: 0 },
+        { thang: 'Tháng 10', count: 0 },
+        { thang: 'Tháng 11', count: 0 },
+        { thang: 'Tháng 12', count: 0 },
+    ]
+    const authorsInMonth = [new Set(), new Set(), new Set(), new Set(), new Set(), new Set(), new Set(), new Set(), new Set(), new Set(), new Set(), new Set()];
+
+    for (let i = 0; i < dataDate.length; i++) {
+        dataDate[i].authors.forEach((x) => {
+
+            authorsInMonth[Number(dataDate[i].id_month) - 1].add(x.author)
+
+        })
+
+    }
+    authorsInMonth.forEach((x, idx) => {
+        baseData[idx] = { ...baseData[idx], count: x.size };
+    })
+    Chart.defaults.global.defaultFontColor = '#021C43';
+    async function renderChart() {
+        const data = [...baseData];
+
+        new Chart(
+            document.getElementById('chartMain'),
+            {
+                type: 'line',
+                data: {
+                    labels: data.map(row => row.thang),
+                    datasets: [
+                        {
+                            label: "Lượng người",
+                            data: data.map(row => row.count),
+                            fill: false,
+                            enabled: false,
+                            borderColor: '#021C43',
+                            tension: 0,
+                            pointStyle: 'circle',
+                            pointRadius: 10,
+                            pointHoverRadius: 15
+
+                        }
+                    ],
+                },
+                options: {
+                    title: {
+                        display: true,
+                        text: `Lượng người khác nhau đăng kí theo tháng trong năm ${nowYear}`,
+                        fontSize: 20
+                    },
+
+                }
+            }
+        );
+    };
+    renderChart()
+
+}
 
 
+const dataWareHouse = async (data={}) => {
+
+    console.log("Bạn đang muốn try cập kho dữ liệu")
+    const modal = document.querySelector('.modal-features')
+    modal.style.display = "flex";
+    modal.classList.add('on')
+    modal.innerHTML = features.feature_wareHouse
+    const exit = modal.querySelector('.exit-feature')
+    exit.onclick = () => {
+        modal.style.display = "none";
+        modal.classList.remove('on')
+        modal.innerHTML = ""
+    }
+    const dataMain= document.querySelector('.data-main')
+    renderDataHouse(data.data,dataMain)
+    
+}
+function renderDataHouse(data={},element){
+    const html=data.map(doc=>{
+        return `
+        <div class="data-list">
+            <div class="del-list" id=${doc.idData}>
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <path d="M8.81 2L5.19 5.63" stroke="#000" stroke-width="1.5" stroke-miterlimit="10" stroke-linecap="round" stroke-linejoin="round"/>
+      <path d="M15.19 2L18.81 5.63" stroke="#000" stroke-width="1.5" stroke-miterlimit="10" stroke-linecap="round" stroke-linejoin="round"/>
+      <path d="M2 7.84998C2 5.99998 2.99 5.84998 4.22 5.84998H19.78C21.01 5.84998 22 5.99998 22 7.84998C22 9.99998 21.01 9.84998 19.78 9.84998H4.22C2.99 9.84998 2 9.99998 2 7.84998Z" stroke="#292D32" stroke-width="1.5"/>
+      <path d="M9.76001 14V17.55" stroke="#000" stroke-width="1.5" stroke-linecap="round"/>
+      <path d="M14.36 14V17.55" stroke="#000" stroke-width="1.5" stroke-linecap="round"/>
+      <path d="M3.5 10L4.91 18.64C5.23 20.58 6 22 8.86 22H14.89C18 22 18.46 20.64 18.82 18.76L20.5 10" stroke="#292D32" stroke-width="1.5" stroke-linecap="round"/>
+      </svg>
+            </div>
+            <span>${doc.title}</span>
+            <span>${doc.timeStart}<i class="fa-solid fa-minus"></i>${doc.timeEnd}</span>
+            <span>${doc.date}</span>
+        </div>
+        `
+    })
+    element.innerHTML=html.join('')
+}
 const featureInfor = () => {
     const modal = document.querySelector('.modal-features')
     modal.style.display = "flex";
@@ -271,7 +393,7 @@ const featureInfor = () => {
             avtview.src = inforCurrentUser.avt
         }
     })
-    
+
     formInfor.onsubmit = (e) => {
         e.preventDefault();
         onLoadSpan()
@@ -343,8 +465,8 @@ const featureInfor = () => {
                     displayName: nameInput.value, photoURL: photoURL,
                 })
                 exit.click()
-               
-                
+
+
                 async function repair() {
                     await getAllUser()
                     accountSignIn.innerHTML = renderUser(user)
@@ -355,7 +477,7 @@ const featureInfor = () => {
                 onLoadSpan()
                 success('Sửa thông tin thành công!')
             } catch (e) {
-                 onLoadSpan()
+                onLoadSpan()
                 console.error("Error adding document: ", e);
                 fail("Sửa thông tin thất bại")
             }
@@ -375,13 +497,14 @@ async function GetYearDate() {
         x.push(doc.data());
     })
     dataDate = [...x]
+
     preLoad()
 }
 
 accountSignIn.addEventListener('click', () => {
     if (signIn === false) {
         containerForm.style.display = "flex";
-       
+
         loginForm()
     }
 })
@@ -799,7 +922,7 @@ function signOut() {
             signIn = false;
             sessionStorage.removeItem('baseUser');
             accountSignIn.innerHTML = `<span  class="account-name btn btn-outline-primary btn-signIn ">Đăng nhập</span>`
-            inforCurrentUser={}
+            inforCurrentUser = {}
             preLoad()
         })
             .catch(() => {
@@ -831,11 +954,11 @@ function signOut() {
 
 //--------------------------------------------------------------------------------
 //------------------------------------------------------------------------------
-function onLoadSpan(){
-    if(loadingSpan.classList.contains('d-block')){
+function onLoadSpan() {
+    if (loadingSpan.classList.contains('d-block')) {
         loadingSpan.classList.remove('d-block');
     }
-    else{
+    else {
         loadingSpan.classList.add('d-block');
     }
 }
@@ -860,16 +983,16 @@ formCreate.onsubmit = (e) => {
         renderRegister();
     }
     else {
-       
+
         fail("Bạn phải đăng nhập để tạo")
     }
 
 }
 function generateString(length) {
-    const characters ='ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+    const characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
     let result = ' ';
     const charactersLength = characters.length;
-    for ( let i = 0; i < length; i++ ) {
+    for (let i = 0; i < length; i++) {
         result += characters.charAt(Math.floor(Math.random() * charactersLength));
     }
 
@@ -886,12 +1009,12 @@ function renderRegister() {
     let flag = true;
     if (timeStartText.trim() === '--:-- AM') {
         flag = false;
-    
+
         timeStart.style.border = '2px solid red';
     }
     if (timeEndText.trim() === '--:-- AM') {
         flag = false;
-     
+
         timeEnd.style.border = '2px solid red';
     }
 
@@ -918,13 +1041,13 @@ function renderRegister() {
             const length = -start + end
             // data đăng kí
             const data = {
-                idData:generateString(20),
+                idData: generateString(20),
                 author: inforCurrentUser.userID,
                 title: headerText !== '' ? headerText : 'No title',
                 bodyTitle: bodyText !== '' ? bodyText : 'No Description',
                 timeStart: timeStartText,
                 timeEnd: timeEndText,
-                capacity:[start-1,end-2],
+                capacity: Array.apply(null, Array(end - start + 1)).map((x, idx) => (start + idx - 1)),
                 lengthDiv: length * height - 5 + 'px',
                 pos: (start - 1) * height + 'px',
                 color: colorUser
@@ -969,10 +1092,10 @@ function renderRegister() {
                     }
                     pushDay(data, registerTime)
                 }
-                document.querySelector('#title-form').value="";
-                document.querySelector('#description-form').value="";
-                timeStart.innerHTML="--:-- AM"
-                timeEnd.innerHTML="--:-- AM"
+                document.querySelector('#title-form').value = "";
+                document.querySelector('#description-form').value = "";
+                timeStart.innerHTML = "--:-- AM"
+                timeEnd.innerHTML = "--:-- AM"
             }
             else {
                 warning();
@@ -985,14 +1108,36 @@ function renderRegister() {
 
 
 
-function pushDay(data, registerTime) {
-    
+async function pushDay(data, registerTime) {
     const dayCheck = cal_days.querySelector(".active");
     const day = dayCheck !== null ? Number(dayCheck.innerHTML) : date.getDate();
     const dayIndex = dayCheck !== null ? dayCheck.dataset.index : sevenDays[date.getDay()]
     const index = sevenDays.findIndex(x => {
         return x === dayIndex;
     })
+    try {
+        const docSnap = await getDoc(doc(db, `data`, `${inforCurrentUser.userID}`));
+        const response = docSnap.data()
+        const response_data = response ? response.data : []
+        const refreshData = {
+            idData: data.idData,
+            author: data.author,
+            timeStart: data.timeStart,
+            timeEnd: data.timeEnd,
+            bodyTitle: data.bodyTitle,
+            title: data.title,
+            color: data.color,
+            date: `${day}-${date.getMonth() + 1}-${date.getFullYear()}`
+        }
+        response_data.push(refreshData)
+        const resuilt = response_data
+        const newData = { data: resuilt }
+        await setDoc(doc(db, `data`, `${inforCurrentUser.userID}`), newData);
+    }
+    catch (e) {
+        console.log(e)
+    }
+
     let find = false;
     async function addDocument(data, idx) {
         try {
@@ -1046,7 +1191,7 @@ function pushDay(data, registerTime) {
 
         })
         addDocument(dataDay, 2)
-        
+
     }
 }
 // neu co data thi in trươc khi thao tác
@@ -1056,7 +1201,7 @@ function preLoad() {
         allPopup[i].outerHTML = ""
     }
     //đang ở view ngày
-    if (where == 1) {    
+    if (where == 1) {
         const dayCheck = cal_days.querySelector(".active");
         const day = dayCheck !== null ? Number(dayCheck.innerHTML) : date.getDate();
         const findIndex = dataDate.findIndex(x => (x.id_month == date.getMonth() + 1 && x.date == day));
@@ -1107,12 +1252,12 @@ function preLoad() {
     if (where == 4) {
         for (let i = 0; i < dataDate.length; i++) {
             const dayCheck = document.querySelectorAll(`#cal__days${dataDate[i].id_month} .daysInMonth`)[dataDate[i].date - 1]
-            console.log(dayCheck, dataDate[i].id_month)
+
             dayCheck.style.border = "2px solid red";
         }
     }
 }
-const repairPopUp=(id)=>{
+const repairPopUp = (id) => {
     return `
         <div id="${id}" class="repairPopUp-container">
             <div id="${id}" class="edit-container cursor-pointer repair-item">
@@ -1135,25 +1280,25 @@ const repairPopUp=(id)=>{
         </div>
     `
 }
-function listenRepairPopUp(){
-    const allRepairTools=document.querySelectorAll('.repairPopUp-container')
+function listenRepairPopUp() {
+    const allRepairTools = document.querySelectorAll('.repairPopUp-container')
     allRepairTools.forEach((item) => {
-        item.addEventListener('click',(e)=>{
-            const target=e.target
-            if(target.closest('.edit-container')){
-                const element=target.closest('.edit-container')
+        item.addEventListener('click', (e) => {
+            const target = e.target
+            if (target.closest('.edit-container')) {
+                const element = target.closest('.edit-container')
                 editPopUp(element)
             }
-            if(target.closest('.delete-container')){
-                const element=target.closest('.delete-container')
+            if (target.closest('.delete-container')) {
+                const element = target.closest('.delete-container')
                 delPopUp(element)
             }
         })
     })
 }
 
-const editPopUp=async (e)=>{
-    const sDays=[
+const editPopUp = async (e) => {
+    const sDays = [
         'Chủ nhật',
         'Thứ hai',
         'Thứ ba',
@@ -1163,14 +1308,22 @@ const editPopUp=async (e)=>{
         'Thứ bảy',
 
     ]
+    const getThu = (data) => {
+        const idx = Number(data[-1])
+        if (idx) {
+            return sDays[idx - 1]
+        }
+        else {
+            return sDays[0]
+        }
+    }
     const dayCheck = cal_days.querySelector(".active");
     const day = dayCheck !== null ? Number(dayCheck.innerHTML) : date.getDate();
     const dayIndex = dayCheck !== null ? getThu(dayCheck.dataset.index) : sDays[date.getDay()]
     onLoadSpan()
-    const data= await getData();
-    onLoadSpan()
-    
-    const id_edit=e.id;
+
+
+    const id_edit = e.id;
     const modal = document.querySelector('.modal-features')
     modal.style.display = "flex";
     modal.classList.add('on')
@@ -1186,75 +1339,87 @@ const editPopUp=async (e)=>{
             exit.click();
         }
     }
-    const getThu=(data)=>{
-        const idx=Number(data[-1])
-        if(idx){
-            return sDays[idx-1]
-        }
-        else{
-            return sDays[0]
-        }
+
+
+    async function getData() {
+        const docSnap1 = await getDoc(doc(db, `${date.getFullYear()}`, `${day}-${date.getMonth() + 1}-${date.getFullYear()}`));
+        const docSnap2 = await getDoc(doc(db, `data`, `${inforCurrentUser.userID}`));
+        return [docSnap1.data(), docSnap2.data()]
     }
 
-
-   
-    
-    async function getData(){
-        const docSnap = await getDoc(doc(db, `${date.getFullYear()}`, `${day}-${date.getMonth()+1}-${date.getFullYear()}`));
-        return docSnap.data(); 
-    }
-    document.querySelector('.update-event .thu-ngay-thang').innerHTML=`${dayIndex}, ${day} Tháng ${date.getMonth()+1}`
-    const title=document.querySelector('.update-event #title-form');
-    const timeStart=document.querySelector('.update-event .time-start');
-    const timeEnd=document.querySelector('.update-event .time-end');
-    const timeTable=document.querySelector('.update-event .timing-table');
-    const descripion=document.querySelector('.update-event #description-form');
-    const btnUpdate=document.querySelector('.update-event .btn-update');
-    timeEnd.style.pointerEvents="none";
-    timeStart.style.pointerEvents="none";
-
+    document.querySelector('.update-event .thu-ngay-thang').innerHTML = `${dayIndex}, ${day} Tháng ${date.getMonth() + 1}`
+    const title = document.querySelector('.update-event #title-form');
+    const timeStart = document.querySelector('.update-event .time-start');
+    const timeEnd = document.querySelector('.update-event .time-end');
+    const timeTable = document.querySelector('.update-event .timing-table');
+    const descripion = document.querySelector('.update-event #description-form');
+    const btnUpdate = document.querySelector('.update-event .btn-update');
+    timeEnd.style.pointerEvents = "none";
+    timeStart.style.pointerEvents = "none";
     document.addEventListener('click', () => {
-            timeTable.classList.remove('d-block');
+        timeTable.classList.remove('d-block');
     })
-    const dataList=[...data.data];
-    const findData=dataList.filter(x=>{return x.idData===id_edit})[0]
-    console.log(findData,dataList,id_edit)
-    title.innerHTML=findData.title;
-    descripion.innerHTML=findData.bodyTitle;
-    timeStart.innerHTML=findData.timeStart;
-    timeEnd.innerHTML=findData.timeEnd;
-    async function pushData(){
-        const newData=dataList.map((item)=>{
-            if(item.idData===id_edit){
-                console.log('go')
-                return {...findData,title:title.value,bodyTitle:descripion.value}
+    const response = await getData()
+    onLoadSpan()
+    const [data1, data2] = response;
+    const dataList1 = data1.data
+    const dataList2 = data2.data
+    const findData1 = dataList1.filter(x => { return x.idData === id_edit })[0]
+    const findData2 = dataList2.filter(x => { return x.idData === id_edit })[0]
+
+    title.value =  findData1.title;
+    descripion.value = findData1.bodyTitle;
+    timeStart.innerHTML = findData1.timeStart;
+    timeEnd.innerHTML = findData1.timeEnd;
+
+    async function pushData() {
+        const newData2 = dataList2.map((item) => {
+            if (item.idData === id_edit) {
+
+                return { ...findData2, title: title.value, bodyTitle: descripion.value }
             }
-            else{
-                return item
+            else {
+                return item;
+            }
+        })
+        const newData = dataList1.map((item) => {
+            if (item.idData === id_edit) {
+
+                return { ...findData1, title: title.value, bodyTitle: descripion.value }
+            }
+            else {
+                return item;
             }
         })
 
-        const resuilt={...data,data:newData}
-        await updateDoc(doc(db, `${date.getFullYear()}`, `${day}-${date.getMonth()+1}-${date.getFullYear()}`), resuilt);
+        const resuilt = { ...data1, data: newData }
+        const resuilt2 = { data: newData2 }
+
+        await updateDoc(doc(db, `${date.getFullYear()}`, `${day}-${date.getMonth() + 1}-${date.getFullYear()}`), resuilt);
+        await updateDoc(doc(db, `data`, `${inforCurrentUser.userID}`), resuilt2);
+
         onLoadSpan()
         preLoad()
         exit.click()
 
     }
-    btnUpdate.onclick=(e)=>{
+    btnUpdate.onclick = (e) => {
         e.preventDefault()
         onLoadSpan()
         pushData()
-        .then(()=>{
-            success('Sửa thành công!')
-        })
-        .catch((e)=>{
-            fail('Sửa không thành công!')
-        })
+            .then(() => {
+                success('Sửa thành công!')
+            })
+            .catch((e) => {
+                fail('Sửa không thành công!')
+            })
     }
 }
-const delPopUp=(e)=>{
-    const id_del=e.id
+
+
+
+const delPopUp = (e) => {
+    const id_del = e.id
     const modal = document.querySelector('.modal-features')
     modal.style.display = "flex";
     modal.classList.add('on')
@@ -1265,9 +1430,9 @@ const delPopUp=(e)=>{
         modal.classList.remove('on')
         modal.innerHTML = ""
     }
-    const noBtn=document.querySelector('.choose-no')
-    const yesBtn=document.querySelector('.choose-yes')
-    noBtn.onclick = ()=>{
+    const noBtn = document.querySelector('.choose-no')
+    const yesBtn = document.querySelector('.choose-yes')
+    noBtn.onclick = () => {
         exit.click()
     }
     document.onclick = (e) => {
@@ -1276,63 +1441,69 @@ const delPopUp=(e)=>{
             exit.click()
         }
     }
-    yesBtn.onclick = ()=>{
+    yesBtn.onclick = () => {
         onLoadSpan()
         const dayCheck = cal_days.querySelector(".active");
         const day = dayCheck !== null ? Number(dayCheck.innerHTML) : date.getDate();
-        async function getData(){
-            const docSnap = await getDoc(doc(db, `${date.getFullYear()}`, `${day}-${date.getMonth()+1}-${date.getFullYear()}`));
-            return docSnap.data(); 
+        async function getData() {
+            const docSnap1 = await getDoc(doc(db, `${date.getFullYear()}`, `${day}-${date.getMonth() + 1}-${date.getFullYear()}`));
+            const docSnap2 = await getDoc(doc(db, `data`, `${inforCurrentUser.userID}`));
+            return [docSnap1.data(), docSnap2.data()]
         }
-        async function editData(){
-            const data= await getData()
-            const dataList=[...data.data];
-            const findData=dataList.filter(x=>{return x.idData===id_del})[0]
-            const capacity=[...findData.capacity]
-            
-            const newRegisterTime=data.registerTime.map((x,idx)=>{
-                if(capacity.findIndex(x=>x===idx)!==-1){
+        async function editData() {
+            const [data1, data2] = await getData()
+            const [dataList1, dataList2] = [data1.data, data2.data];
+            const findData = dataList1.filter(x => { return x.idData === id_del })[0]
+            const capacity = [...findData.capacity]
+            // change mang time
+            const newRegisterTime = data1.registerTime.map((x, idx) => {
+                if (capacity.findIndex(x => x === idx) !== -1) {
                     return !x;
                 }
-                else{
+                else {
                     return x;
                 }
             })
-            const newData=dataList.filter(x=>{return x.idData!==id_del})
-            const newAuthors=[];
-            newData.forEach(data=>{
+            const newData = dataList1.filter(x => { return x.idData !== id_del })
+            const newData2 = dataList1.filter(x => { return x.idData !== id_del })
+
+            const newAuthors = [];
+            newData.forEach(data => {
                 newAuthors.findIndex(x => x.author === data.author) === -1 ? newAuthors.push({
                     author: data.author,
                     color: data.color
                 }) : () => { return false; }
             })
-            
-            newData.forEach(x=>{
-                if(newAuthors.forEach(item=>item))
-                newAuthors.push({
-                    author:x.author,
-                    color:x.color
 
-                })
+            newData.forEach(x => {
+                if (newAuthors.forEach(item => item))
+                    newAuthors.push({
+                        author: x.author,
+                        color: x.color
+
+                    })
             })
-            const resuilt={...data,data:newData,registerTime:newRegisterTime,authors:newAuthors}
-            return resuilt;
-            
+            const resuilt = { ...data1, data: newData, registerTime: newRegisterTime, authors: newAuthors }
+            const resuilt2 = { ...data2, data: newData2 }
+            return [resuilt, resuilt2];
+
         }
-        async function pushData(){
-            const data=await editData();
-            await updateDoc(doc(db, `${date.getFullYear()}`, `${day}-${date.getMonth()+1}-${date.getFullYear()}`), data);
+        async function pushData() {
+            const [data, data2] = await editData();
+            await updateDoc(doc(db, `${date.getFullYear()}`, `${day}-${date.getMonth() + 1}-${date.getFullYear()}`), data);
+            await updateDoc(doc(db, `data`, `${inforCurrentUser.userID}`), data2);
+
             onLoadSpan()
             exit.click()
         }
         pushData()
-        .then(()=>{
-            success('Xóa thành công!')
-        })
-        .catch((e)=>{
-            fail('Xóa không thành công!')
-        })
-       
+            .then(() => {
+                success('Xóa thành công!')
+            })
+            .catch((e) => {
+                fail('Xóa không thành công!')
+            })
+
     }
 }
 
@@ -1342,15 +1513,15 @@ const delPopUp=(e)=>{
 function renderPopupTime(data, index = -1, array = []) {
 
     const author = (usersInApp.filter(x => x.userID === data.author))[0].name
-    
+
     if (where == 1) {
         const timeTable = document.querySelector('.time-table');
 
         const popupTime = `
-        <div class="popupTime" id="${data.idData}" style="position: absolute; height:${data.lengthDiv}; top:${data.pos};  background-color: ${data.color};">
+        <div class="popupTime" id="${data.idData}" style="padding-right:90px; position: absolute; height:${data.lengthDiv}; top:${data.pos};  background-color: ${data.color};">
             <span class="headerPopupTimes">${data.title} | ${data.timeStart} <i class="fa-solid fa-minus"></i> ${data.timeEnd} | ${author} </span> 
             <div class="bodyPopupTimes">Des: ${data.bodyTitle}</div>
-            ${data.author===inforCurrentUser.userID ? repairPopUp(data.idData):''}
+            ${data.author === inforCurrentUser.userID ? repairPopUp(data.idData) : ''}
         </div>
         `
 
@@ -1362,8 +1533,8 @@ function renderPopupTime(data, index = -1, array = []) {
         const popupTime = `
     
         <div class="popupTime" style=" position: absolute;height:${data.lengthDiv};width:calc(14% - 2px); top:${data.pos};left:${(index * 14)}%; background-color: ${data.color};">
-            <span style="width:calc(14% - 2px);" class="headerPopupTimes">${data.title} | ${data.timeStart} <i class="fa-solid fa-minus"></i> ${data.timeEnd} | ${author} </span> 
-            <div style="width: 90%;height:" class="bodyPopupTimes">Des: ${data.bodyTitle}</div>
+            <span style="width:calc(14% - 2px)" class="headerPopupTimes">${data.title} | ${data.timeStart} <i class="fa-solid fa-minus"></i> ${data.timeEnd} | ${author} </span> 
+            <div style="" class="bodyPopupTimes">Des: ${data.bodyTitle}</div>
         </div>
         `
         timeTable.innerHTML = popupTime + timeTable.innerHTML;
@@ -1371,6 +1542,7 @@ function renderPopupTime(data, index = -1, array = []) {
 }
 prevBtn.onclick = () => {
     animTab(where);
+
     if (date.getFullYear() === nowYear) {
         preLoad()
     }
@@ -1378,16 +1550,18 @@ prevBtn.onclick = () => {
         GetYearDate();
         nowYear = date.getFullYear();
     }
-    console.log(nowYear)
 }
 nxtBtn.onclick = () => {
     animTab(where);
+
+
     preLoad()
     if (date.getFullYear() === nowYear) {
         preLoad()
     }
     else {
         GetYearDate();
+        nowYear = date.getFullYear();
     }
 
 
@@ -1400,8 +1574,6 @@ btnToday.onclick = () => {
     else {
         GetYearDate();
         nowYear = date.getFullYear();
-        preLoad()
-
 
     }
 
@@ -1415,7 +1587,7 @@ cal_days.onclick = (e) => {
         else {
             GetYearDate();
             nowYear = date.getFullYear();
-            preLoad()
+
         }
 
     }

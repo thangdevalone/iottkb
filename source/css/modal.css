@@ -42,6 +42,104 @@
     width: 70%;
     height: 75%;
 }
+.modal-features .chart-event{
+    display: block;
+    animation: none;
+    width: 80%;
+    min-width: 900px;
+    min-height: 650px;
+    height: 90%;
+}
+.modal-features .dataWareHouse-event{
+    display: block;
+    border-radius:0px;
+    color: black;
+    animation: none;
+    width: 100%;
+    height: 100%;
+}
+.dataWareHouse-event .modal-body{
+    overflow: hidden;
+}
+ 
+.dataWareHouse-event .data-container{
+    width: 100%;
+    height: calc(100% - 50px);
+    border: 2px solid black;
+}
+.data-container .wareHouse-top{
+    height: 20%;
+    border-bottom: 2px solid black;
+    padding: 5px 10px;
+   
+}
+
+
+.data-container .wareHouse-bottom{
+    height: 80%;
+}
+.wareHouse-bottom .tools{
+    height: 50px;
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+    position: relative;
+    border-bottom: 1px solid  rgb(0 0 0 / 54%);
+    box-shadow: 0px 12px 8px -15px #111; 
+
+}
+
+.wareHouse-bottom .tools > div{
+    margin: 0px 10px;
+    display: flex;
+    align-items: center;
+    border-radius: 10px;
+    padding:5px;
+    cursor: pointer;
+
+}
+.wareHouse-bottom .tools >div>span{
+    margin-left: 5px;
+}
+.wareHouse-bottom .tools path{
+    stroke-width: 2px !important;
+}
+
+.wareHouse-bottom .tools >div:hover{
+    background-color: var(--color-item-hover);
+}
+.wareHouse-bottom .data-main{
+    overflow-y: scroll;
+    height: calc(100% - 50px);
+    display: flex;
+    flex-direction: column;
+}  
+.wareHouse-bottom .data-main .data-list{
+    display: flex;
+    align-items: center;
+    position: relative;
+    height: 50px;
+    font-weight: 500;
+    font-size: 16px;
+    background-color: rgba(255, 0, 0, 0.35);
+    border-bottom:1px solid black ;
+    justify-content: space-around;
+    padding-right: 50px;
+    border-right:1px solid black ;
+}
+.data-main .data-list .del-list{
+    position: absolute;
+    top:50%;
+    transform: translateY(-50%);
+    cursor: pointer;
+    right: 20px;
+}
+.modal-features .chart-event .modal-body{
+    display: flex;
+    justify-content: center;
+    overflow: hidden;
+    align-items: center;
+}
 .modal-features .update-event{
     display: block;
     animation: none;

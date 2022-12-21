@@ -6,6 +6,12 @@
    #accout-infor {
       height: 450px;
    }
+   .loading .rote-bg{
+      min-width: 900px;
+      min-height: 900px;
+      top:-20%;
+      left: -45%;
+    }
    .userInfor > img{
       width: 80px!important;
       height: 80px!important;
@@ -15,4 +21,9 @@
       height: 40px;
       font-size: 16px;
    }
-  }
+}
+@media only screen and (max-width: 900px) {
+   .rote-main{
+      display: none;
+     }
+}

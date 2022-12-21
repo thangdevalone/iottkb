@@ -57,6 +57,9 @@ ul {
 .h5 {
   margin-bottom: 0;
 }
+.text-bold{
+  font-weight: bold;
+}
 .fwb {
   font-weight: bold;
 }
@@ -269,8 +272,15 @@ ul {
   transform: translateX(-50%);
   margin-top: 20px;
 }
+.bodyPopupTimes{
+  width: 90%;
+  height: calc(100% - 18px);
+  text-overflow: ellipsis;
+  overflow: hidden;
+}
 .calendar-table-body {
   overflow-y: scroll;
+  overflow-x: hidden;
   display: flex;
   height: calc(100vh - 150px);
   width: 100%;

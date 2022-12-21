@@ -136,9 +136,88 @@ const feature_infor = `
 </form>
 </div>
 `
+const feature_chart = `
+<div class="modal chart-event">
+<div class="modal-header ">
+  <span class="exit-feature cursor-pointer"><i class="fa-solid fa-xmark"></i></span>
+</div>
+<div class="modal-body " id="chartContainer">
+<canvas id="chartMain" width="680" height="320">Your browser does not support the canvas element.</canvas>
+</div>
+
+</div>
+`
+const feature_wareHouse = `
+<div class="modal dataWareHouse-event">
+<div class="modal-header ">
+  <span class="exit-feature cursor-pointer"><i class="fa-solid fa-xmark"></i></span>
+</div>
+<div class="modal-body " id="dataContainer">
+<h4 class="text-center text-bold">Dữ liệu của tôi</h4>
+<div class="data-container">
+  <div class="wareHouse-top">
+    <span class="text-bold">Filter</span>
+  </div>
+  <div class="wareHouse-bottom">
+    <div class="tools text-bold ">
+      <div id="delAll tool "><svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <path d="M8.81 2L5.19 5.63" stroke="#292D32" stroke-width="1.5" stroke-miterlimit="10" stroke-linecap="round" stroke-linejoin="round"/>
+      <path d="M15.19 2L18.81 5.63" stroke="#292D32" stroke-width="1.5" stroke-miterlimit="10" stroke-linecap="round" stroke-linejoin="round"/>
+      <path d="M2 7.84998C2 5.99998 2.99 5.84998 4.22 5.84998H19.78C21.01 5.84998 22 5.99998 22 7.84998C22 9.99998 21.01 9.84998 19.78 9.84998H4.22C2.99 9.84998 2 9.99998 2 7.84998Z" stroke="#292D32" stroke-width="1.5"/>
+      <path d="M9.76001 14V17.55" stroke="#292D32" stroke-width="1.5" stroke-linecap="round"/>
+      <path d="M14.36 14V17.55" stroke="#292D32" stroke-width="1.5" stroke-linecap="round"/>
+      <path d="M3.5 10L4.91 18.64C5.23 20.58 6 22 8.86 22H14.89C18 22 18.46 20.64 18.82 18.76L20.5 10" stroke="#292D32" stroke-width="1.5" stroke-linecap="round"/>
+      </svg>
+      
+       <span>Xóa tất cả</span> 
+      </div>
+      <div id="select tool">
+      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <path d="M22 11.1V6.9C22 3.4 20.6 2 17.1 2H12.9C9.4 2 8 3.4 8 6.9V8H11.1C14.6 8 16 9.4 16 12.9V16H17.1C20.6 16 22 14.6 22 11.1Z" stroke="#292D32" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+      <path d="M16 17.1V12.9C16 9.4 14.6 8 11.1 8H6.9C3.4 8 2 9.4 2 12.9V17.1C2 20.6 3.4 22 6.9 22H11.1C14.6 22 16 20.6 16 17.1Z" stroke="#292D32" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+      <path d="M6.08008 15L8.03008 16.95L11.9201 13.05" stroke="#292D32" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+      </svg>
+      <span>Chọn</span> 
+      </div>
+      <div id="SortArc tool">
+      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <path d="M10.45 6.71997L6.72998 3L3.01001 6.71997" stroke="#292D32" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+      <path d="M6.72998 21V3" stroke="#292D32" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+      <path d="M13.55 17.28L17.2701 21L20.9901 17.28" stroke="#292D32" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+      <path d="M17.27 3V21" stroke="#292D32" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+      </svg>
+
+
+      <span>Sắp xếp tăng</span> 
+      </div>
+      <div id="SortDesc tool">
+      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <path d="M10.45 6.71997L6.72998 3L3.01001 6.71997" stroke="#292D32" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+      <path d="M6.72998 21V3" stroke="#292D32" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+      <path d="M13.55 17.28L17.2701 21L20.9901 17.28" stroke="#292D32" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+      <path d="M17.27 3V21" stroke="#292D32" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+      </svg>
+      <span>Sắp xếp giảm</span> 
+      </div>
+    </div>
+    <div class="data-main">
+        <ul>
+          
+
+        </ul>
+    </div>
+  </div>
+
+</div>
+</div>
+
+</div>
+`
 const features = {
   feature_admin: feature_admin,
   feature_user: feature_user,
   feature_infor: feature_infor,
+  feature_chart: feature_chart,
+  feature_wareHouse: feature_wareHouse,
 }
 export default features;
