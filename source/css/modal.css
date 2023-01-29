@@ -42,6 +42,15 @@
     width: 70%;
     height: 75%;
 }
+.modal-features .infor-user{
+    display: block;
+    animation: none;
+    width: 50%;
+    min-width: 400px;
+    max-width: 1000px;
+    height: 75%;
+}
+
 .modal-features .chart-event{
     display: block;
     animation: none;
@@ -104,9 +113,15 @@
 .wareHouse-bottom .tools path{
     stroke-width: 2px !important;
 }
+.tool.active-tool{
+    background-color: red;
+}
 
 .wareHouse-bottom .tools >div:hover{
     background-color: var(--color-item-hover);
+}
+.tool.active-tool:hover{
+    background-color: red!important;
 }
 .wareHouse-bottom .data-main{
     overflow-y: scroll;
@@ -121,11 +136,22 @@
     height: 50px;
     font-weight: 500;
     font-size: 16px;
-    background-color: rgba(255, 0, 0, 0.35);
+    background-color: rgb(248 157 157 / 35%);
     border-bottom:1px solid black ;
-    justify-content: space-around;
+ 
     padding-right: 50px;
     border-right:1px solid black ;
+}
+.wareHouse-bottom .data-main .data-list.active-list{
+    background-color: rgb(228 0 0 / 35%);
+}
+.wareHouse-bottom .data-main .data-list .data-des{
+    text-align: center;
+    width: 33%;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    padding: 0 20px;
 }
 .data-main .data-list .del-list{
     position: absolute;
@@ -134,11 +160,20 @@
     cursor: pointer;
     right: 20px;
 }
+.data-main .data-list .select-list{
+    position: absolute;
+    top:35%;
+    transform: scale(1.8);
+
+    cursor: pointer;
+    left: 20px;
+    width: 10px;
+}
 .modal-features .chart-event .modal-body{
     display: flex;
     justify-content: center;
     overflow: hidden;
-    align-items: center;
+    align-items: flex-start;
 }
 .modal-features .update-event{
     display: block;

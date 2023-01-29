@@ -31,7 +31,13 @@ const firebaseConfig = {
 };
 
 //--------------------------------------------------------------------------------
-
+function debounce(func, timeout = 300) {
+    let timer;
+    return (...args) => {
+        clearTimeout(timer);
+        timer = setTimeout(() => { func.apply(this, args); }, timeout);
+    };
+}
 const success = (s = "Bạn đã đăng ký thành công tại IOTCALENDAR.") => {
     toast({
         title: "Thành công!",
@@ -74,7 +80,7 @@ const btnView = document.querySelector('.btn-view');
 
 let dataDate = [];
 let colorUser;
-let nowYear = date.getFullYear();
+
 let signIn = false;
 let inforCurrentUser = {};
 let usersInApp = []
@@ -172,14 +178,48 @@ async function getAllUser() {
     usersInApp = [...x]
     hasUser = true;
     renderFullUser()
-
+    handleFullUser()
 }
 
+function handleFullUser() {
+    const users = document.querySelectorAll(".username-app");
+    users.forEach((user, idx) => {
+        user.addEventListener('click', () => {
+            const modal = document.querySelector('.modal-features')
+            const userClick = usersInApp[idx]
+            modal.style.display = "flex";
+            modal.classList.add('on')
+            modal.innerHTML = `
+            <div class="modal infor-user">
+            <div class="modal-header" style="background-color:${userClick.color}">
+            <span class="exit-feature cursor-pointer" "><i class="fa-solid fa-xmark"></i></span>
+            </div>
+            <h4 class="text-center  mt-2 mb-3" >Thông tin tài khoản</h4>
+            <div class="wrap-content">
+            <div><strong>Tên: </strong> ${userClick.name}</div>
+            <div><strong>Gmail: </strong> ${userClick.email}</div>
+            <div><strong>Mã giáo viên: </strong> ${userClick.mgv}</div>
+            <div><strong>Liên hệ: </strong> ${userClick.phoneNumber || "Chưa có"}</div>
+            <div><strong>Ảnh đại diện: </strong><img style="width:100px;height:100px" src="${userClick.avt}" alt="avt"/></div>
+
+            </div>
+            </div>
+            `
+            const exit = modal.querySelector('.exit-feature')
+            exit.onclick = () => {
+                modal.style.display = "none";
+                modal.classList.remove('on')
+                modal.innerHTML = ""
+            }
+            console.log(usersInApp[idx])
+        })
+    })
+}
 function renderFullUser() {
     const fullUserBox = document.querySelector('.all-user ul');
     const html = usersInApp.map((user, idx) => {
         return `
-        <li class="pd-10 cursor-pointer feature feature-flex username-app" class="feature" id="user${idx}">
+        <li class="pd-10 cursor-pointer feature feature-flex username-app" id="user${idx}">
         <div><img class="all-user_avt" src=${user.avt} alt="avt"></div>
         <span class="all-user_name">
             ${user.name}
@@ -272,7 +312,7 @@ const dataAnalystic = async () => {
                 options: {
                     title: {
                         display: true,
-                        text: `Lượng người khác nhau đăng kí theo tháng trong năm ${nowYear}`,
+                        text: `Lượng người khác nhau đăng kí theo tháng trong năm ${checkYear}`,
                         fontSize: 20
                     },
 
@@ -285,9 +325,8 @@ const dataAnalystic = async () => {
 }
 
 
-const dataWareHouse = async (data={}) => {
-
-    console.log("Bạn đang muốn try cập kho dữ liệu")
+const dataWareHouse = async (data = {}) => {
+    let dataUser = [...data.data];
     const modal = document.querySelector('.modal-features')
     modal.style.display = "flex";
     modal.classList.add('on')
@@ -298,14 +337,253 @@ const dataWareHouse = async (data={}) => {
         modal.classList.remove('on')
         modal.innerHTML = ""
     }
-    const dataMain= document.querySelector('.data-main')
-    renderDataHouse(data.data,dataMain)
-    
+    const dataMain = document.querySelector('.data-main')
+    renderDataHouse(dataUser, dataMain)
+    function handleFindData(titleFind) {
+        if (titleFind) {
+            dataUser = data.data.filter(x => {
+                return x.title.toLowerCase().includes(titleFind.toLowerCase())
+            })
+        }
+        else {
+            dataUser = [...data.data]
+        }
+        renderDataHouse(dataUser, dataMain)
+
+    }
+    const allDataList = document.querySelectorAll('.data-list')
+    const deleteBtn = document.querySelectorAll('.del-list')
+    let tools = document.querySelector('.tools');
+    const baseTools = tools.innerHTML
+    console.log(dataUser)
+    const filter = document.querySelector("#filter")
+    const filterContainer = document.querySelector("#filterContainer")
+
+    filter.addEventListener('change', () => {
+        if (filter.value === "date") {
+            filterContainer.innerHTML = `
+            <form id="filterForm">
+            <input type="number" name="day" placeholder="Ngày" /> 
+            <input type="number" name="thang" placeholder="Tháng"/> 
+            <input type="number" name="nam" placeholder="Năm"/> 
+            <button type="submit" class="btn btn-primary">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <path d="M14.3201 19.07C14.3201 19.68 13.92 20.48 13.41 20.79L12.0001 21.7C10.6901 22.51 8.87006 21.6 8.87006 19.98V14.63C8.87006 13.92 8.47006 13.01 8.06006 12.51L4.22003 8.47C3.71003 7.96 3.31006 7.06001 3.31006 6.45001V4.13C3.31006 2.92 4.22008 2.01001 5.33008 2.01001H18.67C19.78 2.01001 20.6901 2.92 20.6901 4.03V6.25C20.6901 7.06 20.1801 8.07001 19.6801 8.57001" stroke="#FFF" stroke-width="1.5" stroke-miterlimit="10" stroke-linecap="round" stroke-linejoin="round"/>
+        <path d="M16.07 16.52C17.8373 16.52 19.27 15.0873 19.27 13.32C19.27 11.5527 17.8373 10.12 16.07 10.12C14.3027 10.12 12.87 11.5527 12.87 13.32C12.87 15.0873 14.3027 16.52 16.07 16.52Z" stroke="#FFF" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+        <path d="M19.87 17.12L18.87 16.12" stroke="#FFF" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+     Filter
+            </button>
+            </form>
+        `
+        }
+        if (filter.value === "name") {
+            filterContainer.innerHTML = ` <input class="input-simple" id="findTitle" type="text" placeholder="Tìm kiếm theo tiêu đề">`
+        }
+    })
+    filterContainer.addEventListener('click', (e) => {
+        const target = e.target
+        if (target.closest('#findTitle')) {
+            const inputFind = filterContainer.querySelector("#findTitle")
+            inputFind.addEventListener('input', debounce(() => handleFindData(inputFind.value), 1000))
+        }
+        if (target.closest("#filterForm")) {
+            const filterForm = filterContainer.querySelector("#filterForm")
+            filterForm.onsubmit = (e) => {
+                e.preventDefault();
+                const dayValue = Number(e.target[0].value) || ""
+                const monthValue = Number(e.target[1].value) || ""
+                const yearValue = Number(e.target[2].value) || ""
+                console.log(dayValue, monthValue, yearValue)
+                if (dayValue < 0 || monthValue < 0 || yearValue < 0 || dayValue > 32 || monthValue > 12) {
+                    fail("Hãy nhập đúng dữ liệu")
+                    return;
+                }
+
+                dataUser = data.data.filter(x => {
+                    const arrayDate = x.date.split("-")
+                    console.log(arrayDate)
+                    if (dayValue === "" && monthValue === "" && yearValue === "") {
+                        return true;
+                    }
+                    if (arrayDate[0] == dayValue && monthValue === "" && yearValue === "") {
+                        return true;
+                    }
+                    if (arrayDate[0] == dayValue && arrayDate[1] === monthValue && yearValue === "") {
+                        return true;
+                    }
+                    if (dayValue === "" && arrayDate[1] == monthValue && yearValue === "") {
+                        return true;
+                    }
+                    if (dayValue === "" && arrayDate[1] == monthValue && arrayDate[2] == yearValue) {
+                        return true;
+                    }
+                    if (dayValue === "" && monthValue === "" && arrayDate[2] == yearValue) {
+                        return true;
+                    }
+                    if (arrayDate[0] == dayValue && monthValue === "" && arrayDate[2] == yearValue) {
+                        return true;
+                    }
+                    if (arrayDate[0] == dayValue && arrayDate[1] == monthValue && arrayDate[2] == yearValue) {
+                        return true;
+                    }
+                    return false;
+                })
+
+                renderDataHouse(dataUser, dataMain)
+
+            }
+        }
+    })
+    deleteBtn.forEach((item, i) => {
+        item.addEventListener('click', () => {
+            const day = dataUser[i].date.split('-')
+            del(dataUser[i].idData, 0, { _thisDay: day[0], _thisMonth: day[1], _thisYear: day[2] })
+                .then(() => {
+                    success('Xóa thành công!');
+                    (async () => {
+                        const docSnap = await getDoc(doc(db, `data`, `${inforCurrentUser.userID}`));
+                        dataWareHouse(docSnap.data())
+                    })()
+                })
+                .catch((e) => {
+                    fail('Xóa không thành công!')
+                    console.log(e)
+                })
+        })
+    })
+    tools.addEventListener('click', (e) => {
+        const target = e.target
+        if (target.closest("#select")) {
+            const select = tools.querySelector("#select")
+
+            const allSelect = document.querySelectorAll('.select-list')
+            select.classList.toggle('active-tool')
+            if (select.classList.contains('active-tool')) {
+                tools.innerHTML += `
+            <div class="tool" id="delAll"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <path d="M8.81 2L5.19 5.63" stroke="#292D32" stroke-width="1.5" stroke-miterlimit="10" stroke-linecap="round" stroke-linejoin="round"/>
+          <path d="M15.19 2L18.81 5.63" stroke="#292D32" stroke-width="1.5" stroke-miterlimit="10" stroke-linecap="round" stroke-linejoin="round"/>
+          <path d="M2 7.84998C2 5.99998 2.99 5.84998 4.22 5.84998H19.78C21.01 5.84998 22 5.99998 22 7.84998C22 9.99998 21.01 9.84998 19.78 9.84998H4.22C2.99 9.84998 2 9.99998 2 7.84998Z" stroke="#292D32" stroke-width="1.5"/>
+          <path d="M9.76001 14V17.55" stroke="#292D32" stroke-width="1.5" stroke-linecap="round"/>
+          <path d="M14.36 14V17.55" stroke="#292D32" stroke-width="1.5" stroke-linecap="round"/>
+          <path d="M3.5 10L4.91 18.64C5.23 20.58 6 22 8.86 22H14.89C18 22 18.46 20.64 18.82 18.76L20.5 10" stroke="#292D32" stroke-width="1.5" stroke-linecap="round"/>
+          </svg>
+           <span>Xóa dữ liệu đã chọn</span> 
+          </div>
+          <div class="tool" id="selectAll">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <path d="M22 11.1V6.9C22 3.4 20.6 2 17.1 2H12.9C9.4 2 8 3.4 8 6.9V8H11.1C14.6 8 16 9.4 16 12.9V16H17.1C20.6 16 22 14.6 22 11.1Z" stroke="#292D32" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+          <path d="M16 17.1V12.9C16 9.4 14.6 8 11.1 8H6.9C3.4 8 2 9.4 2 12.9V17.1C2 20.6 3.4 22 6.9 22H11.1C14.6 22 16 20.6 16 17.1Z" stroke="#292D32" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+          <path d="M6.08008 15L8.03008 16.95L11.9201 13.05" stroke="#292D32" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+          <span>Chọn tất cả</span> 
+          </div>
+            `;
+                const selectAll = document.querySelector('#selectAll');
+                const deleteAll = document.querySelector('#delAll');
+
+                deleteAll.addEventListener('click', () => {
+                    (async () => {
+                        for (let i = 0; i < allSelect.length; i++) {
+
+                            if (allSelect[i].checked) {
+                                const day = dataUser[i].date.split('-')
+                                await del(dataUser[i].idData, 0, { _thisDay: day[0], _thisMonth: day[1], _thisYear: day[2] })
+                            }
+                        }
+                    })()
+                        .then(() => {
+                            success('Xóa thành công!');
+                            (async () => {
+                                const docSnap = await getDoc(doc(db, `data`, `${inforCurrentUser.userID}`));
+                                dataWareHouse(docSnap.data())
+                            })()
+                        })
+                        .catch((e) => {
+                            fail('Xóa không thành công!')
+                            console.log(e)
+                        })
+
+                })
+                selectAll.addEventListener('click', () => {
+                    selectAll.classList.toggle('active-tool')
+
+                    if (selectAll.classList.contains('active-tool')) {
+                        for (let i = 0; i < allSelect.length; i++) {
+                            if (!allSelect[i].checked) {
+                                allDataList[i].classList.toggle('active-list')
+                                allSelect[i].checked = true
+                            }
+                        }
+                    }
+                    else {
+                        for (let i = 0; i < allSelect.length; i++) {
+                            if (allSelect[i].checked) {
+                                allDataList[i].classList.toggle('active-list')
+                                allSelect[i].checked = false
+                            }
+                        }
+                    }
+
+                })
+                allDataList.forEach((item, idx) => {
+                    item.style.cursor = 'pointer'
+                    item.addEventListener('click', (e) => {
+                        if (e.target.tagName == 'INPUT') return;
+                        const tg = e.target.closest('.data-list')
+                        console.log(tg)
+                        if (tg) {
+                            allSelect[idx].checked = !allSelect[idx].checked
+                            tg.classList.toggle('active-list')
+                        }
+
+                    })
+                })
+
+                allSelect.forEach((select, index) => {
+                    if (!select.classList.contains('d-block'))
+                        select.classList.add('d-block')
+                    select.onclick = () => {
+                        allDataList[index].classList.toggle('active-list')
+                    }
+                })
+            }
+            else {
+                tools.innerHTML = baseTools
+                select.classList.toggle('active-tool')
+                allSelect.forEach((select) => {
+                    if (select.classList.contains('d-block'))
+                        select.classList.remove('d-block')
+                })
+
+            }
+        }
+        if (target.closest("#export")) {
+            const configData = dataUser.map((item) => {
+                return [
+                    item.title,
+                    item.bodyTitle,
+                    item.date,
+                    item.timeStart,
+                    item.timeEnd,
+                ]
+            })
+            const resuilt = [["Tiêu đề", "Mô tả", "Ngày", "Giờ bắt đầu", "Giờ kết thúc"], ...configData]
+            var workbook = XLSX.utils.book_new(),
+                worksheet = XLSX.utils.aoa_to_sheet(resuilt);
+            XLSX.utils.book_append_sheet(workbook, worksheet, "WebCalendar")
+
+            XLSX.writeFile(workbook, "Calendar.xlsx", { numbers: XLSX_ZAHL_PAYLOAD, compression: true });
+        }
+    })
+
 }
-function renderDataHouse(data={},element){
-    const html=data.map(doc=>{
+function renderDataHouse(data = {}, element) {
+    const html = data.map(doc => {
         return `
-        <div class="data-list">
+        <div class="data-list" id=${doc.idData}>
+        <input type="checkbox" class="select-list" id=${doc.idData}/>
             <div class="del-list" id=${doc.idData}>
             <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
       <path d="M8.81 2L5.19 5.63" stroke="#000" stroke-width="1.5" stroke-miterlimit="10" stroke-linecap="round" stroke-linejoin="round"/>
@@ -316,13 +594,16 @@ function renderDataHouse(data={},element){
       <path d="M3.5 10L4.91 18.64C5.23 20.58 6 22 8.86 22H14.89C18 22 18.46 20.64 18.82 18.76L20.5 10" stroke="#292D32" stroke-width="1.5" stroke-linecap="round"/>
       </svg>
             </div>
-            <span>${doc.title}</span>
-            <span>${doc.timeStart}<i class="fa-solid fa-minus"></i>${doc.timeEnd}</span>
-            <span>${doc.date}</span>
+
+            <div class="data-des">${doc.title}</div>
+            <div class="data-des">${doc.timeStart}<i class="fa-solid fa-minus"></i>${doc.timeEnd}</div>
+            <div class="data-des">${doc.date}</div>
+     
+            
         </div>
         `
     })
-    element.innerHTML=html.join('')
+    element.innerHTML = html.join('')
 }
 const featureInfor = () => {
     const modal = document.querySelector('.modal-features')
@@ -990,7 +1271,7 @@ formCreate.onsubmit = (e) => {
 }
 function generateString(length) {
     const characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
-    let result = ' ';
+    let result = '';
     const charactersLength = characters.length;
     for (let i = 0; i < length; i++) {
         result += characters.charAt(Math.floor(Math.random() * charactersLength));
@@ -1047,7 +1328,7 @@ function renderRegister() {
                 bodyTitle: bodyText !== '' ? bodyText : 'No Description',
                 timeStart: timeStartText,
                 timeEnd: timeEndText,
-                capacity: Array.apply(null, Array(end - start + 1)).map((x, idx) => (start + idx - 1)),
+                capacity: Array.apply(null, Array(end - start)).map((x, idx) => (start + idx - 1)),
                 lengthDiv: length * height - 5 + 'px',
                 pos: (start - 1) * height + 'px',
                 color: colorUser
@@ -1367,7 +1648,7 @@ const editPopUp = async (e) => {
     const findData1 = dataList1.filter(x => { return x.idData === id_edit })[0]
     const findData2 = dataList2.filter(x => { return x.idData === id_edit })[0]
 
-    title.value =  findData1.title;
+    title.value = findData1.title;
     descripion.value = findData1.bodyTitle;
     timeStart.innerHTML = findData1.timeStart;
     timeEnd.innerHTML = findData1.timeEnd;
@@ -1442,72 +1723,84 @@ const delPopUp = (e) => {
         }
     }
     yesBtn.onclick = () => {
-        onLoadSpan()
         const dayCheck = cal_days.querySelector(".active");
         const day = dayCheck !== null ? Number(dayCheck.innerHTML) : date.getDate();
-        async function getData() {
-            const docSnap1 = await getDoc(doc(db, `${date.getFullYear()}`, `${day}-${date.getMonth() + 1}-${date.getFullYear()}`));
-            const docSnap2 = await getDoc(doc(db, `data`, `${inforCurrentUser.userID}`));
-            return [docSnap1.data(), docSnap2.data()]
-        }
-        async function editData() {
-            const [data1, data2] = await getData()
-            const [dataList1, dataList2] = [data1.data, data2.data];
-            const findData = dataList1.filter(x => { return x.idData === id_del })[0]
-            const capacity = [...findData.capacity]
-            // change mang time
-            const newRegisterTime = data1.registerTime.map((x, idx) => {
-                if (capacity.findIndex(x => x === idx) !== -1) {
-                    return !x;
-                }
-                else {
-                    return x;
-                }
-            })
-            const newData = dataList1.filter(x => { return x.idData !== id_del })
-            const newData2 = dataList1.filter(x => { return x.idData !== id_del })
-
-            const newAuthors = [];
-            newData.forEach(data => {
-                newAuthors.findIndex(x => x.author === data.author) === -1 ? newAuthors.push({
-                    author: data.author,
-                    color: data.color
-                }) : () => { return false; }
-            })
-
-            newData.forEach(x => {
-                if (newAuthors.forEach(item => item))
-                    newAuthors.push({
-                        author: x.author,
-                        color: x.color
-
-                    })
-            })
-            const resuilt = { ...data1, data: newData, registerTime: newRegisterTime, authors: newAuthors }
-            const resuilt2 = { ...data2, data: newData2 }
-            return [resuilt, resuilt2];
-
-        }
-        async function pushData() {
-            const [data, data2] = await editData();
-            await updateDoc(doc(db, `${date.getFullYear()}`, `${day}-${date.getMonth() + 1}-${date.getFullYear()}`), data);
-            await updateDoc(doc(db, `data`, `${inforCurrentUser.userID}`), data2);
-
-            onLoadSpan()
-            exit.click()
-        }
-        pushData()
+        del(id_del, modal, { _thisDay: day, _thisYear: date.getFullYear(), _thisMonth: date.getMonth() + 1 })
             .then(() => {
                 success('Xóa thành công!')
             })
             .catch((e) => {
                 fail('Xóa không thành công!')
+                console.log(e)
             })
-
     }
 }
 
+async function del(id_del, modal = 0, { _thisDay = 0, _thisMonth = 0, _thisYear = 0 }) {
+    onLoadSpan()
 
+    async function getData() {
+        const docSnap1 = await getDoc(doc(db, `${_thisYear}`, `${_thisDay}-${_thisMonth}-${_thisYear}`));
+        const docSnap2 = await getDoc(doc(db, `data`, `${inforCurrentUser.userID}`));
+        return [docSnap1.data(), docSnap2.data()]
+    }
+    async function editData() {
+        const [data1, data2] = await getData()
+
+        const [dataList1, dataList2] = [data1.data, data2.data];
+
+        console.log(dataList1, dataList2)
+        const findData = dataList1.filter(x => { return x.idData === id_del })[0]
+        const capacity = [...findData.capacity]
+        // change mang time
+        const newRegisterTime = data1.registerTime.map((x, idx) => {
+            if (capacity.findIndex(x => x === idx) !== -1) {
+                return !x;
+            }
+            else {
+                return x;
+            }
+        })
+        const newData = dataList1.filter(x => { return x.idData !== id_del })
+        const newData2 = dataList2.filter(x => { return x.idData !== id_del })
+
+        const newAuthors = [];
+        newData.forEach(data => {
+            newAuthors.findIndex(x => x.author === data.author) === -1 ? newAuthors.push({
+                author: data.author,
+                color: data.color
+            }) : () => { return false; }
+        })
+
+        newData2.forEach(x => {
+            if (newAuthors.forEach(item => item))
+                newAuthors.push({
+                    author: x.author,
+                    color: x.color
+
+                })
+        })
+        const resuilt = { ...data1, data: newData, registerTime: newRegisterTime, authors: newAuthors }
+        const resuilt2 = { ...data2, data: newData2 }
+        return [resuilt, resuilt2];
+
+    }
+    async function pushData() {
+        const [data, data2] = await editData();
+        await updateDoc(doc(db, `${_thisYear}`, `${_thisDay}-${_thisMonth}-${_thisYear}`), data);
+        await updateDoc(doc(db, `data`, `${inforCurrentUser.userID}`), data2);
+
+        onLoadSpan()
+        if (modal) {
+            modal.style.display = "none";
+            modal.classList.remove('on')
+            modal.innerHTML = ""
+        }
+    }
+    await pushData()
+
+
+}
 // render ra popup
 
 function renderPopupTime(data, index = -1, array = []) {
@@ -1543,66 +1836,63 @@ function renderPopupTime(data, index = -1, array = []) {
 prevBtn.onclick = () => {
     animTab(where);
 
-    if (date.getFullYear() === nowYear) {
+    if (date.getFullYear() === checkYear) {
         preLoad()
     }
     else {
         GetYearDate();
-        nowYear = date.getFullYear();
+        checkYear = date.getFullYear();
     }
 }
 nxtBtn.onclick = () => {
     animTab(where);
 
-
-    preLoad()
-    if (date.getFullYear() === nowYear) {
+    if (date.getFullYear() === checkYear) {
         preLoad()
     }
     else {
         GetYearDate();
-        nowYear = date.getFullYear();
+        checkYear = date.getFullYear();
     }
-
-
 }
 btnToday.onclick = () => {
     animTab(where);
-    if (date.getFullYear() === nowYear) {
+    if (date.getFullYear() === checkYear) {
         preLoad()
     }
     else {
         GetYearDate();
-        nowYear = date.getFullYear();
+        checkYear = date.getFullYear();
 
     }
 
 }
+
 cal_days.onclick = (e) => {
     if (e.target.classList.contains('daysInMonth')) {
         animTab(where);
-        if (date.getFullYear() === nowYear) {
+        if (date.getFullYear() === checkYear) {
             preLoad()
         }
         else {
             GetYearDate();
-            nowYear = date.getFullYear();
+            checkYear = date.getFullYear();
 
         }
 
     }
-
 }
 btnView.addEventListener('click', () => {
-    view.forEach((item) => {
+    view.forEach((item, idx) => {
         item.addEventListener('click', () => {
-            if (date.getFullYear() === nowYear) {
+            if (date.getFullYear() === checkYear) {
                 preLoad()
             }
             else {
                 GetYearDate();
-                nowYear = date.getFullYear();
+                checkYear = date.getFullYear();
             }
         });
     });
 });
+export default GetYearDate;

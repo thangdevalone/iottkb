@@ -1,8 +1,9 @@
 
+import GetYearDate from "./App.js";
 const prevBtn = document.querySelector('.calender-arrow-l');
 const nxtBtn = document.querySelector('.calender-arrow-r');
-const btnToday = document.querySelector('.btn-today');
 
+const btnToday = document.querySelector('.btn-today');
 const calTable = document.querySelector(".calendar-table")
 const btnView = document.querySelector(".btn-view");
 const allDates = document.querySelector('.cal__days');
@@ -110,7 +111,7 @@ prevBtn.addEventListener('click', () => {
 
 nxtBtn.addEventListener('click', () => {
 	date.setMonth(date.getMonth() + 1);
-	display()
+	display();
 	mapping(date);
 	glassCalendar();
 	handleNP();
@@ -172,7 +173,7 @@ function animTab(where) {
 		calTable.innerHTML = htmls.year;
 		renderYear();
 
-		// handleYear();
+
 	}
 	return false;
 }
@@ -227,12 +228,46 @@ if (where == 1) {
 }
 function renderYear() {
 	const xDate = new Date(date.getFullYear(), date.getMonth(), date.getDate())
-
 	calTable.innerHTML = `
-		<h1 style="text-align:center;font-size:20px;color:black; font-weight:bold;">${xDate.getFullYear()}</h1>
-		<div class="fullCalendar-table"> </div>
+	<h1 class="header-year">
+	<span class="arrow-f-l ico cursor-pointer">
+	<i class=" fa-solid fa-angle-left"></i>
+	</span>
+	${xDate.getFullYear()}
+	<span class="arrow-f-r item-margin-l-10 ico cursor-pointer ">
+	<i class="fa-solid fa-angle-right"></i>
+	</span>
+	</h1>
+	<div class="fullCalendar-table"> </div>
 	`
 	const fullTable = calTable.querySelector(".fullCalendar-table")
+	
+	const arrowL = document.querySelector('.arrow-f-l');
+	const arrowR = document.querySelector('.arrow-f-r');
+	arrowL.addEventListener('click', () =>{
+		date.setFullYear(date.getFullYear()-1)
+		renderYear()
+		display();
+
+		glassCalendar();
+		handleNP();
+
+		GetYearDate();
+		checkYear=date.getFullYear();
+
+	})
+	arrowR.addEventListener('click', () =>{
+		date.setFullYear(date.getFullYear()+1)
+		renderYear()
+		display();
+
+		glassCalendar();
+		handleNP();
+		GetYearDate();
+		checkYear = date.getFullYear();
+
+
+	})
 	for (let i = 1; i <= 12; i++) {
 		fullTable.innerHTML += `
 		<div class="calendar__index" id="calYear${i}">
@@ -307,7 +342,7 @@ function handleAT(day, tabDay, check) {
 			tabDay.classList.remove("today")
 		}
 	}
-	tabDay.style.boxShadow="rgba(0, 0, 0, 0.35) 0px 5px 15px"
+	tabDay.style.boxShadow = "rgba(0, 0, 0, 0.35) 0px 5px 15px"
 }
 // xử lí thao tác next và prev
 function handleNP() {
@@ -328,7 +363,6 @@ function handleDay() {
 	const dayCheck = allDates.querySelector(".active");
 	const day = dayCheck !== null ? dayCheck.innerHTML : date.getDate();
 	const dayText = dayCheck !== null ? dayCheck.dataset.index : sevenDays[date.getDay()];
-
 	const tabThu = calTable.querySelector(".table__thu")
 	const tabDay = calTable.querySelector('#table__date')
 	tabDay.innerHTML = day
@@ -341,7 +375,7 @@ function handleWeek() {
 	const weekdays = document.querySelectorAll('.weekdays');
 	const days = document.querySelectorAll('.days');
 
-	
+
 	// clear();
 	const check = new Date()
 	const dayCheck = allDates.querySelector(".active");
@@ -360,7 +394,7 @@ function handleWeek() {
 		if (dayNow + 1 <= lengthMonth) {
 			days[i].innerHTML = ++dayNow;
 			days[i].style.boxShadow = "rgba(0, 0, 0, 0.35) 0px 5px 15px"
-			if(dayNow===date.getDate()){
+			if (dayNow === date.getDate()) {
 				days[i].classList.add('today')
 			}
 			weekdays[i].innerHTML = sevenDays[i]
@@ -373,7 +407,7 @@ function handleWeek() {
 		if (dayNow - 1 >= 1) {
 			days[i].innerHTML = --dayNow
 			days[i].style.boxShadow = "rgba(0, 0, 0, 0.35) 0px 5px 15px"
-			if(dayNow===date.getDate()){
+			if (dayNow === date.getDate()) {
 				days[i].classList.add('today')
 			}
 			weekdays[i].innerHTML = sevenDays[i]
@@ -387,23 +421,22 @@ function handleMonth() {
 		const start = sevenDays.findIndex(item => item === monthData[0].thu)
 		const addRow = `
 		<div class="row d-flex-table f-1-1 flex-direction-row table-day-row-6 pd-0 mg-0">
-							<div class="table-day"></div>
-							<div class="table-day"></div>
-							<div class="table-day"></div>
-							<div class="table-day"></div>
-							<div class="table-day"></div>
-							<div class="table-day"></div>
-							<div class="table-day"></div>
-						</div>
+			<div class="table-day"><div class="color-request"></div></div>
+			<div class="table-day"><div class="color-request"></div></div>
+			<div class="table-day"><div class="color-request"></div></div>
+			<div class="table-day"><div class="color-request"></div></div>
+			<div class="table-day"><div class="color-request"></div></div>
+			<div class="table-day"><div class="color-request"></div></div>
+			<div class="table-day"><div class="color-request"></div></div>				
 		`
 		const base = `${htmls.base}`
+		const dataTable = document.querySelector('.table');
+
 		if (tableTest.length - start < monthData.length) {
-			const dataTable = document.querySelector('.table');
-			dataTable.innerHTML += addRow;
+			dataTable.innerHTML = base + addRow;
 			tableTest = document.querySelectorAll('.table-day');
 		}
 		else {
-			const dataTable = document.querySelector('.table');
 			dataTable.innerHTML = base;
 			tableTest = document.querySelectorAll('.table-day');
 		}

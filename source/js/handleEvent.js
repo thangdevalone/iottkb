@@ -1,7 +1,7 @@
 const date = new Date();
 let where = 1;
 var save = '';
-
+let checkYear = date.getFullYear();
 const twelveMonths = [
     'tháng 1',
     'tháng 2',
@@ -117,7 +117,7 @@ document.addEventListener('mousemove', function (event) {
         createModal.style.top = (mousePosition.y + offset[1]) + 'px';
     }
 }, true);
-
+//ham xu li tao
 function handleCreate() {
 
     if (!modal.classList.contains('d-block')) {
