@@ -10,8 +10,24 @@ import {
     getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, GoogleAuthProvider,
     updateProfile, updateEmail, setPersistence, browserSessionPersistence,
 } from "https://www.gstatic.com/firebasejs/9.13.0/firebase-auth.js";
-import { getFirestore, collection, doc, setDoc, updateDoc, getDoc, addDoc, getDocs, onSnapshot } from "https://www.gstatic.com/firebasejs/9.13.0/firebase-firestore.js";
+import {
+    getFirestore,
+    collection,
+    doc,
+    setDoc,
+    updateDoc,
+    getDoc,
+    addDoc,
+    getDocs,
+    onSnapshot,
+    query,
+    orderBy,
+    limit,
+    serverTimestamp,
+} from "https://www.gstatic.com/firebasejs/9.13.0/firebase-firestore.js";
 import { getStorage, ref, uploadBytesResumable, getDownloadURL } from "https://www.gstatic.com/firebasejs/9.13.0/firebase-storage.js";
+import { getMessaging, getToken, onMessage } from "https://www.gstatic.com/firebasejs/9.13.0/firebase-messaging.js";
+import { getPerformance } from "https://www.gstatic.com/firebasejs/9.13.0/firebase-performance.js";
 import htmls from "./html.js";
 
 // TODO: Add SDKs for Firebase products that you want to use
@@ -116,7 +132,7 @@ async function firstIn() {
             // ...
             if (auth.currentUser) {
                 handleUser(auth.currentUser)
-                document.querySelector('.main').innerHTML+=htmls.chat
+                document.querySelector('.main').innerHTML += htmls.chat
                 chat()
                 signIn = true;
             }
@@ -864,7 +880,7 @@ function loginForm() {
                 // Signed in 
                 onLoadSpan()
                 success("Bạn đã đăng nhập tài khoản thành công.")
-                document.querySelector('.main').innerHTML+=htmls.chat
+                document.querySelector('.modal-chat').innerHTML = htmls.chat
                 chat()
                 signIn = true;
                 setTimeout(() => {
@@ -1205,8 +1221,8 @@ function signOut() {
         auth.signOut().then(() => {
             success('Đăng xuất thành công');
             signIn = false;
-            document.querySelector('.chat-container').outerHTML=""
-            document.querySelector('.button-chat_ct').outerHTML=""
+            document.querySelector('.modal-chat').outerHTML = ""
+
             sessionStorage.removeItem('baseUser');
             accountSignIn.innerHTML = `<span  class="account-name btn btn-outline-primary btn-signIn ">Đăng nhập</span>`
             inforCurrentUser = {}
@@ -1847,65 +1863,161 @@ function renderPopupTime(data, index = -1, array = []) {
         timeTable.innerHTML = popupTime + timeTable.innerHTML;
     }
 }
+async function loadMessages() {
+    // Create the query to load the last 12 messages and listen for new ones.
+    const recentMessagesQuery = query(collection(getFirestore(), 'messages'), orderBy('timestamp', 'asc'), limit(12));
+    const chatData = document.getElementById('chatData');
+    chatData.innerHTML = "";
 
-function chat(){
+    const queryData = await getDocs(recentMessagesQuery)
+
+    const x=[]
+    queryData.forEach((doc) => {
+
+        const message = { ...doc.data(), timestamp: doc.data().timestamp?.toDate(), id: doc.id };
+        x.push(message);
+    })
+    x.forEach(((mess,idx)=>{
+        if(idx-1>=0){
+            if (x[idx-1].user.userID!==mess.user.userID) {
+                const htmls = `
+                  <div ${inforCurrentUser.userID !== mess.user.userID ?`style="margin-top:10px"`:""} class=${inforCurrentUser.userID === mess.user.userID ? "chat-me" : "chat-other"}><span id="space"></span>
+                  <div class="${inforCurrentUser.userID === mess.user.userID ? "me" : "other"}  chat-item">${inforCurrentUser.userID !== mess.user.userID ?`<div class="if-chat">${mess.user.name}</div>`:""}${mess.text.toString()}</div>
+                  ${inforCurrentUser.userID !== mess.user.userID ? `<img class="avt-chat" src="${mess.user.avt}" />`:""}
+    
+                  </div>
+                  `
+                chatData.innerHTML += htmls
+    
+            }
+            else{
+                const htmls = `
+                  <div class=${inforCurrentUser.userID === mess.user.userID ? "chat-me" : "chat-other"}><span id="space"></span>
+                  <div class="${inforCurrentUser.userID === mess.user.userID ? "me" : "other"}  chat-item" style="margin-left:47px">${mess.text.toString()}</div>    
+                  </div>
+                  `
+                chatData.innerHTML += htmls
+            }
+        }else{
+            const htmls = `
+                  <div class=${inforCurrentUser.userID === mess.user.userID ? "chat-me" : "chat-other"}><span id="space"></span>
+                  <div class="${inforCurrentUser.userID === mess.user.userID ? "me" : "other"}  chat-item">${inforCurrentUser.userID !== mess.user.userID ?`<div class="if-chat">${mess.user.name}</div>`:""}${mess.text.toString()}</div>
+                  ${inforCurrentUser.userID !== mess.user.userID ? `<img class="avt-chat" src="${mess.user.avt}" />`:""}
+    
+                  </div>
+                  `
+                chatData.innerHTML += htmls
+        }
+  
+    }))
+
+
+
+    // Start listening to the query.
+
+}
+function chat() {
     const btnSend = document.getElementById('btnSend')
-    const chatMain= document.getElementById('chatMain')
-    const chatData= document.getElementById('chatData')
+    const chatMain = document.getElementById('chatMain');
+    const chatData = document.getElementById('chatData');
     const chatBox = document.getElementById('chatBox');
     
+    onSnapshot(query(collection(getFirestore(), 'messages'), orderBy('timestamp', 'desc')), function (snapshot) {
+        snapshot.docChanges().forEach(function (change) {
+
+            const message = { ...change.doc.data(), timestamp: change.doc.data().timestamp?.toDate(), id: change.doc.id };
+            if (inforCurrentUser.userID !== change.doc.data().user.userID) {
+                const htmls = `
+                    <div class="chat-other"><span id="space"></span>
+                    <div class="other  chat-item"><div class="if-chat">${message.user.name}</div>${message.text.toString()}</div>
+                    <img class="avt-chat" src="${message.user.avt}" />
+                    </div>
+                    `
+                const save = Math.floor(chatMain.scrollTop)
+                const base = Math.floor(chatMain.scrollHeight)
+                chatData.innerHTML += htmls
+                const check = 
+                chatMain.offsetHeight === base - save || 
+                chatMain.offsetHeight + 1 === base - save || 
+                chatMain.offsetHeight + 2 === base - save || 
+                chatMain.offsetHeight - 1 === base - save || 
+                chatMain.offsetHeight - 2 === base - save
+                if (check)
+                    chatMain.scrollTo(0, chatMain.scrollHeight)
+
+
+
+            }
+        })
+    });
     const handleChat = (value) => {
-     
-        const htmls=`
+
+        const htmls = `
         <div class="chat-me"><span id="space"></span>
         <div class="me chat-item">${value.toString()}</div>
         </div>
         `
-        chatData.innerHTML+=htmls
-        const loadCt=document.getElementById('load-ct')
-        loadCt.style.display="flex"
-        setTimeout(() => {
-            loadCt.style.display="none"
-        }, 2000);
-        chatMain.scrollTo(0,chatMain.scrollHeight)
+        chatData.innerHTML += htmls
+        const loadCt = document.getElementById('load-ct');
+        loadCt.style.display = "flex";
+        (async () => {
+            // Add a new message entry to the Firebase database.
+            try {
+                await addDoc(collection(getFirestore(), 'messages'), {
+                    user: inforCurrentUser,
+                    text: value.toString(),
+                    timestamp: serverTimestamp(),
+                });
+                loadCt.style.display = "none"
+            }
+            catch (error) {
+                console.error('Error writing new message to Firebase Database', error);
+            }
+        })()
+
+
+        chatMain.scrollTo(0, chatMain.scrollHeight)
         chatMain.style.scrollBehavior = "smooth"
-        
+
     }
-    document.getElementById('collapse').addEventListener('click', ()=>{
-        const chatContainer=document.querySelector('.chat-container')
-        if(chatContainer.classList.contains('collapsed')){
+    document.getElementById('collapse').addEventListener('click', () => {
+        const chatContainer = document.querySelector('.chat-container')
+        if (chatContainer.classList.contains('collapsed')) {
             chatContainer.classList.remove('collapsed')
-            
+
         }
-        else{
+        else {
             chatContainer.classList.add('collapsed')
         }
     })
-    const btnChat=document.querySelector('.button-chat_ct')
-    
-    document.getElementById('closeChat').addEventListener('click', () =>btnChat.click())
-    btnChat.addEventListener('click',()=>{
-        const chatContainer=document.querySelector('.chat-container')
-        if(!btnChat.classList.contains('act')){
-            chatContainer.style.display="flex"
-            btnChat.classList.add('act')
-    
-    
+    const btnChat = document.querySelector('.button-chat_ct')
+
+    document.getElementById('closeChat').addEventListener('click', () => btnChat.click())
+    btnChat.addEventListener('click', async () => {
+        const chatContainer = document.querySelector('.chat-container')
+        if (!btnChat.classList.contains('act')) {
+            chatContainer.style.display = "flex"
+            btnChat.classList.add('act');
+            await loadMessages()
+
+            chatMain.scrollTo(0, chatMain.scrollHeight)
+
         }
-        else{
-            chatContainer.style.display="none"
+        else {
+            chatContainer.style.display = "none"
             btnChat.classList.remove('act')
-    
-    
+
+
         }
-    
+
     })
     chatBox.addEventListener('keyup', (e) => {
-        if(e.key==="Enter"){
-            
-            const data=chatBox.value.replace(/<[^>]+>/g, '')
-            if(data==="") return
-            chatBox.value=""
+        if (e.key === "Enter") {
+
+            const data = chatBox.value.replace(/<[^>]+>/g, '')
+            if (data === "") return
+            chatBox.value = ""
+
             handleChat(data)
         }
         if (chatBox.value === "") {
@@ -1916,7 +2028,7 @@ function chat(){
             btnSend.classList.add("act");
         }
     })
-    
+
 }
 
 prevBtn.onclick = () => {

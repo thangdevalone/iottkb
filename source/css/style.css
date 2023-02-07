@@ -726,30 +726,31 @@ input[type="number"]::-webkit-inner-spin-button {
   justify-content: center;
   background-color: #fff;
 }
-.button-chat_ct.act{
+.button-chat_ct.act {
   background-color: #80b5fb;
-
 }
-.button-chat_ct.act svg path{
-  stroke:#fff !important;
+.button-chat_ct.act svg path {
+  stroke: #fff !important;
 }
 .chat-container {
   position: absolute;
   z-index: 500;
   bottom: 0;
   right: 150px;
-  width: 350px;
-  height: 400px;
+  width: 380px;
+  height: 450px;
   border-radius: 10px 10px 0 0;
   box-shadow: rgba(0, 0, 0, 0.35) 0px 5px 15px;
   background-color: #fff;
   display: none;
   flex-direction: column;
   transition: transform 0.5s;
-
 }
-.chat-container.collapsed{
-  transform: translateY(340px);
+.chat-container.collapsed {
+  transform: translateY(390px);
+}
+.modal-chat {
+  position: relative;
 }
 .chat-box {
   height: 60px;
@@ -784,6 +785,12 @@ input[type="number"]::-webkit-inner-spin-button {
 
   color: #000;
 }
+.avt-chat {
+  width: 40px;
+  height: 40px;
+  margin-right: 7px;
+  border-radius: 50%;
+}
 .other {
   background-color: #fff;
 }
@@ -791,12 +798,17 @@ input[type="number"]::-webkit-inner-spin-button {
   box-shadow: rgba(50, 50, 93, 0.25) 0px 2px 5px -1px,
     rgba(0, 0, 0, 0.3) 0px 1px 3px -1px;
   border-radius: 7px;
-  padding: 5px 8px;
+  padding: 8px 10px;
   margin-bottom: 4px;
   word-wrap: break-word; /* IE 5.5-7 */
   white-space: -moz-pre-wrap; /* Firefox 1.0-2.0 */
   white-space: pre-wrap;
   max-width: 200px;
+}
+.if-chat {
+  font-size: 12px;
+  margin-bottom: 5px;
+  color: #887d7d;
 }
 .chat-head {
   height: 60px;
@@ -868,26 +880,24 @@ input[type="number"]::-webkit-inner-spin-button {
   box-sizing: border-box;
   animation: rotation 1s linear infinite;
 }
-#load-ct{
+#load-ct {
   display: none;
   justify-content: flex-end;
 }
-.icon-df{
-  border:1px solid black;
+.icon-df {
+  border: 1px solid black;
   border-radius: 5px;
   display: inline-flex;
   margin-left: 10px;
   cursor: pointer;
   transition: all 0.2;
-  
 }
-.icon-df:hover{
+.icon-df:hover {
   background-color: #838d99;
-
 }
-.f-chat{
+.f-chat {
   position: absolute;
-  top:50%;
+  top: 50%;
   transform: translateY(-10px);
   right: 15px;
 }

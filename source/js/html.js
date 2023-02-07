@@ -549,13 +549,7 @@ const chat=`
         <div class="space-c"></div>
 
         <div id="chatData">
-          <div class="chat-me"><span id="space"></span>
-            <div class="me chat-item">Hello!</div>
-          </div>
-
-          <div class="chat-other"><span id="space"></span>
-            <div class="other chat-item">Hello!</div>
-          </div>
+     
         </div>
 
         <div id="load-ct">
