@@ -153,18 +153,28 @@ const feature_wareHouse = `
   <span class="exit-feature cursor-pointer"><i class="fa-solid fa-xmark"></i></span>
 </div>
 <div class="modal-body " id="dataContainer">
-<h4 class="text-center text-bold">Dữ liệu của tôi</h4>
+<h4 class="text-center text-bold">Quản lý dữ liệu</h4>
 <div class="data-container">
   <div class="wareHouse-top">
     <span class="text-bold">Filter</span>
+    
+    <div style="display:flex; align-items: center;">
     <div>
     <label for="filter">Choose a filter:</label>
-
     <select id="filter">
       <option value="date" selected>Lọc theo ngày</option>
       <option value="name">Lọc theo tiêu đề</option>
+    
     </select>
     </div>
+    <div style="margin-left:20px">
+    <input type="radio" id="myData" name="data" checked/>
+    <label for="myData">Dữ liệu của tôi</label>
+    <input  style="margin-left:10px" type="radio" id="allData" name="data"/>
+    <label for="allData">Dữ liệu tất cả</label>
+    </div>
+    </div>
+   
     <div id="filterContainer">
     <form id="filterForm">
             <input type="number" name="day" placeholder="Ngày"/> 

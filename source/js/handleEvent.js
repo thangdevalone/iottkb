@@ -1,6 +1,6 @@
 const date = new Date();
 let where = 1;
-var save = '';
+let save = '';
 let checkYear = date.getFullYear();
 const twelveMonths = [
     'tháng 1',

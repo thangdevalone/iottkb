@@ -11,10 +11,10 @@ const modal = document.querySelector('.modal');
 const calMonth = document.querySelector('#cal__month');
 const headerDate = document.querySelector('#header__date');
 
-
-const nowMonth = date.getMonth();
-const nowYear = date.getFullYear();
-
+const nowTime = new Date()
+const nowMonth = nowTime.getMonth();
+const nowYear = nowTime.getFullYear();
+const nowDay = nowTime.getDate();
 import htmls from "./html.js"
 // calTable.innerHTML=htmls.day
 
@@ -35,7 +35,7 @@ function mapping(data) {
 			thu: sevenDays[firstDayThu],
 			month: data.getMonth() + 1,
 			"year": data.getFullYear(),
-			flag: ((data.getDate() == i) && (data.getMonth() == nowMonth) && (data.getFullYear() == nowYear)) ? "today" : "not-today"
+			flag: ((nowDay == i) && (data.getMonth() == nowMonth) && (data.getFullYear() == nowYear)) ? "today" : "not-today"
 		}
 		mappingMonth.push(day)
 		firstDayThu = (firstDayThu + 1) % 7;
@@ -82,6 +82,7 @@ function display(today = -1) {
 	const yearNow = date.getFullYear();
 	const dayCheck = allDates.querySelector(".active");
 	const day = dayCheck !== null ? dayCheck.innerHTML : date.getDate();
+	console.log(monthIndex,calMonth,day)
 	calMonth.innerHTML = twelveMonths[monthIndex][0].toUpperCase() + twelveMonths[monthIndex].slice(1);
 	calMonth.innerHTML += `, ${yearNow}`;
 	if (today === -1) {
@@ -96,8 +97,8 @@ display()
 
 // // Added event listener to buttons for
 prevBtn.addEventListener('click', () => {
-	date.setMonth(date.getMonth() - 1);
-	display()
+	date.setMonth(date.getMonth() - 1, 1);
+	display();
 	mapping(date);
 	glassCalendar();
 	handleNP();
@@ -110,7 +111,8 @@ prevBtn.addEventListener('click', () => {
 });
 
 nxtBtn.addEventListener('click', () => {
-	date.setMonth(date.getMonth() + 1);
+
+	date.setMonth(date.getMonth() + 1, 1);
 	display();
 	mapping(date);
 	glassCalendar();
@@ -153,6 +155,47 @@ btnView.addEventListener('click', () => {
 	handleViewTable()
 }
 )
+const handleClickM = () => {
+	const months = document.querySelectorAll('.calendar__index')
+	months.forEach((month, idx) => {
+		month.addEventListener('click', () => {
+			const thangView = document.getElementById('thangView');
+			const namView = document.getElementById('namView');
+			btnView.querySelector('span').innerHTML = "Tháng"
+			thangView.classList.add('viewing')
+			namView.classList.remove('viewing')
+
+			where = 3
+			date.setMonth(idx,1);
+
+			display();
+			mapping(date);
+			glassCalendar();
+			animTab(3);
+			handleNP();
+		});
+	})
+};
+const handleClickD = () => {
+	const getDays = document.querySelectorAll('.table-day:has(.dayInNowMonth)')
+	getDays.forEach((day, idx) => {
+		day.addEventListener('click', () => {
+			console.log(day)
+			const thangView = document.getElementById('thangView');
+			const ngayView = document.getElementById('ngayView');
+			btnView.querySelector('span').innerHTML = "Ngày"
+			ngayView.classList.add('viewing')
+			thangView.classList.remove('viewing')
+			where = 1;
+			date.setMonth(date.getMonth(),idx+1);
+			mapping(date);
+			glassCalendar();
+			animTab(1);
+			const allDateCal=document.querySelectorAll('.daysInMonth')
+			allDateCal[idx].click()
+		})
+	})
+}
 function animTab(where) {
 	if (where == 1) {
 		calTable.innerHTML = htmls.day;
@@ -167,15 +210,17 @@ function animTab(where) {
 	if (where == 3) {
 		calTable.innerHTML = htmls.month;
 		handleMonth();
+		handleClickD();
 
 	}
 	if (where == 4) {
 		calTable.innerHTML = htmls.year;
 		renderYear();
+		handleClickM();
 
 
 	}
-	return false;
+
 }
 function handleViewTable() {
 	const view = document.querySelectorAll(".view-list");
@@ -241,32 +286,31 @@ function renderYear() {
 	<div class="fullCalendar-table"> </div>
 	`
 	const fullTable = calTable.querySelector(".fullCalendar-table")
-	
+
 	const arrowL = document.querySelector('.arrow-f-l');
 	const arrowR = document.querySelector('.arrow-f-r');
-	arrowL.addEventListener('click', () =>{
-		date.setFullYear(date.getFullYear()-1)
+	arrowL.addEventListener('click', () => {
+		date.setFullYear(date.getFullYear() - 1)
 		renderYear()
 		display();
-
 		glassCalendar();
 		handleNP();
+		animTab(4)
 
 		GetYearDate();
-		checkYear=date.getFullYear();
+
+		checkYear = date.getFullYear();
 
 	})
-	arrowR.addEventListener('click', () =>{
-		date.setFullYear(date.getFullYear()+1)
+	arrowR.addEventListener('click', () => {
+		date.setFullYear(date.getFullYear() + 1)
 		renderYear()
 		display();
-
 		glassCalendar();
+		animTab(4)
 		handleNP();
 		GetYearDate();
 		checkYear = date.getFullYear();
-
-
 	})
 	for (let i = 1; i <= 12; i++) {
 		fullTable.innerHTML += `
@@ -296,7 +340,7 @@ function renderYear() {
 
 		for (let x = emptyDates; x > 0; x--) {
 
-			htmls += `<span data-index="${sevenDays[dateIndex]}" class="not"></span>`;
+			htmls += `<span  style="cursor:default" data-index="${sevenDays[dateIndex]}" class="not_"></span>`;
 			dateIndex++;
 
 		}
@@ -305,9 +349,9 @@ function renderYear() {
 			dateIndex = dateIndex >= 7 ? dateIndex % 7 : dateIndex
 
 			if (mappingMonth[i].flag === "today") {
-				htmls += `<span class="daysInMonth today" data-index="${sevenDays[dateIndex]}" >${mappingMonth[i].day}</span>`;
+				htmls += `<span style="cursor:default" class="daysInMonth today" data-index="${sevenDays[dateIndex]}" >${mappingMonth[i].day}</span>`;
 			} else {
-				htmls += `<span class="daysInMonth" data-index="${sevenDays[dateIndex]}">${mappingMonth[i].day}</span>`;
+				htmls += `<span  style="cursor:default" class="daysInMonth" data-index="${sevenDays[dateIndex]}">${mappingMonth[i].day}</span>`;
 			}
 			dateIndex++;
 
@@ -325,12 +369,21 @@ function whereAmI() {
 	}
 	if (where == 3) {
 		handleMonth();
+		handleClickD();
+
+	}
+	if (where == 4) {
+		renderYear();
+		handleClickM();
+
+
 	}
 
 }
+
 //xử lí phần  ngày active hay today
 function handleAT(day, tabDay, check) {
-	if (day == date.getDate() && date.getMonth() == check.getMonth() && check.getFullYear() == date.getFullYear()) {
+	if (day == check.getDate() && date.getMonth() == check.getMonth() && check.getFullYear() == date.getFullYear()) {
 		tabDay.classList.add("today")
 		if (tabDay.classList.contains("active")) {
 			tabDay.classList.remove("active")
@@ -347,12 +400,11 @@ function handleAT(day, tabDay, check) {
 // xử lí thao tác next và prev
 function handleNP() {
 	const dateArray = allDates.querySelectorAll('span')
-	const thisDay = save ? save.innerHTML : date.getDate()
+	const thisDay = date.getDate()
 	for (let i = 0; i < dateArray.length; i++) {
 		if (dateArray[i].innerHTML == thisDay) {
 			dateArray[i].classList.add('active')
 			save = dateArray[i]
-			whereAmI()
 			break;
 		}
 	}
@@ -427,21 +479,21 @@ function handleMonth() {
 			<div class="table-day"><div class="color-request"></div></div>
 			<div class="table-day"><div class="color-request"></div></div>
 			<div class="table-day"><div class="color-request"></div></div>
-			<div class="table-day"><div class="color-request"></div></div>				
+			<div class="table-day"><div class="color-request"></div></div>	
+			</div>
+					
 		`
 		const base = `${htmls.base}`
 		const dataTable = document.querySelector('.table');
-
+		console.log(tableTest.length,start)
+		dataTable.innerHTML=base
 		if (tableTest.length - start < monthData.length) {
-			dataTable.innerHTML = base + addRow;
-			tableTest = document.querySelectorAll('.table-day');
+			dataTable.innerHTML+=  addRow;
 		}
-		else {
-			dataTable.innerHTML = base;
-			tableTest = document.querySelectorAll('.table-day');
-		}
-		const table = tableTest
+
+		const table = document.querySelectorAll('.table-day')
 		var k = 0;
+		console.log(table)
 		for (let i = start; i < monthData.length + start; i++) {
 			table[i].innerHTML += `<span class ="dayInNowMonth">${monthData[k++].day}</span> `;
 		}
@@ -457,12 +509,13 @@ function handleMonth() {
 	mapping(date);
 
 	renderFullMonth(mappingMonth)
-	const dayInNowMonth = calTable.querySelectorAll('.dayInNowMonth');
+	const dayInNowMonth = document.querySelectorAll('.dayInNowMonth');
 	const lengthMonth = new Date(date.getFullYear(), date.getMonth() + 1, 0).getDate();
 
-	const start = sevenDays.findIndex(item => item === mappingMonth[0].thu)
+
 	const calDates = allDates.querySelectorAll('.daysInMonth')
-	for (let i = start; i < lengthMonth; i++) {
+
+	for (let i = 0; i < lengthMonth; i++) {
 		if (calDates[i].classList.contains('active')) {
 
 			dayInNowMonth[i].classList.add('active');

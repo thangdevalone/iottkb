@@ -507,6 +507,74 @@ const modalEdit=`
     </form>
 </div>
 `
+const chat=`
+<div class="button-chat_ct">
+      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <path
+          d="M18.47 16.83L18.86 19.99C18.96 20.82 18.07 21.4 17.36 20.97L13.17 18.48C12.71 18.48 12.26 18.45 11.82 18.39C12.56 17.52 13 16.42 13 15.23C13 12.39 10.54 10.09 7.49997 10.09C6.33997 10.09 5.26997 10.42 4.37997 11C4.34997 10.75 4.33997 10.5 4.33997 10.24C4.33997 5.68999 8.28997 2 13.17 2C18.05 2 22 5.68999 22 10.24C22 12.94 20.61 15.33 18.47 16.83Z"
+          stroke="#292D32" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+        <path
+          d="M13 15.23C13 16.42 12.56 17.5201 11.82 18.3901C10.83 19.5901 9.26 20.36 7.5 20.36L4.89 21.91C4.45 22.18 3.89 21.81 3.95 21.3L4.2 19.3301C2.86 18.4001 2 16.91 2 15.23C2 13.47 2.94 11.9201 4.38 11.0001C5.27 10.4201 6.34 10.0901 7.5 10.0901C10.54 10.0901 13 12.39 13 15.23Z"
+          stroke="#292D32" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+      </svg>
+    </div>
+    <div class="chat-container">
+      <div class="chat-head pd-10">
+        <div class="f-chat">
+          <span class="icon-df" id="collapse">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path d="M6 12H18" stroke="#292D32" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+            </svg>
+
+
+          </span>
+          <span class="icon-df " id="closeChat">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path d="M8.5 15.5L15.5 8.5" stroke="#292D32" stroke-width="1.5" stroke-linecap="round"
+                stroke-linejoin="round" />
+              <path d="M15.5 15.5L8.5 8.5" stroke="#292D32" stroke-width="1.5" stroke-linecap="round"
+                stroke-linejoin="round" />
+            </svg>
+
+          </span>
+
+        </div>
+        <img class="chat-avt rounded-circle" src="./source/img/logo.png" alt="logo">
+        <div class="chat-name">
+          <strong>Nhóm Chat IotLab</strong>
+          <span><span id="dot">•</span> Nhắn tin trao đổi công việc</span>
+        </div>
+      </div>
+      <div id="chatMain" class="chat-main pd-10">
+        <div class="space-c"></div>
+
+        <div id="chatData">
+          <div class="chat-me"><span id="space"></span>
+            <div class="me chat-item">Hello!</div>
+          </div>
+
+          <div class="chat-other"><span id="space"></span>
+            <div class="other chat-item">Hello!</div>
+          </div>
+        </div>
+
+        <div id="load-ct">
+          <span class="loader"></span>
+        </div>
+      </div>
+      <div class="chat-box pd-10">
+
+        <input type="text" id="chatBox" placeholder="Nhập tin nhắn...">
+        <div id="btnSend">
+          <svg width="30" height="30" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+            <path
+              d="M19.29 9.17005L7.70002 3.07005C4.95002 1.62005 1.96002 4.55005 3.35002 7.33005L4.97002 10.57C5.42002 11.47 5.42002 12.53 4.97002 13.43L3.35002 16.67C1.96002 19.45 4.95002 22.37 7.70002 20.93L19.29 14.83C21.57 13.63 21.57 10.37 19.29 9.17005Z"
+              stroke="#292D32" stroke-width="1" stroke-linecap="round" stroke-linejoin="round" />
+          </svg>
+        </div>
+      </div>
+    </div>
+`
 const htmls = {
     day: day,
     week: week,
@@ -514,5 +582,6 @@ const htmls = {
     month: month,
     modalDel:modalDel,
     modalEdit:modalEdit,
+    chat:chat
 }
 export default htmls

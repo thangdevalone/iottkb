@@ -95,10 +95,15 @@
 	color: white;
 }
 .calendar__index{
-	width: 200px;
-	height: 200px;
+	padding:10px 10px 0px 10px;
+	margin: 20px;
+	border-radius:10px;
+	cursor: pointer;
+	transition: background-color 0.2s;
 }
-
+.calendar__index:hover{
+	background-color: #dbebff;
+}
 
 .calendar__index .cal__weekdays {
 	display: grid;

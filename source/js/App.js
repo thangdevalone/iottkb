@@ -116,6 +116,8 @@ async function firstIn() {
             // ...
             if (auth.currentUser) {
                 handleUser(auth.currentUser)
+                document.querySelector('.main').innerHTML+=htmls.chat
+                chat()
                 signIn = true;
             }
             // New sign-in will be persisted with session persistence.
@@ -326,7 +328,7 @@ const dataAnalystic = async () => {
 
 
 const dataWareHouse = async (data = {}) => {
-    let dataUser = [...data.data];
+    let dataUser = [...data?.data || []];
     const modal = document.querySelector('.modal-features')
     modal.style.display = "flex";
     modal.classList.add('on')
@@ -340,13 +342,13 @@ const dataWareHouse = async (data = {}) => {
     const dataMain = document.querySelector('.data-main')
     renderDataHouse(dataUser, dataMain)
     function handleFindData(titleFind) {
-        if (titleFind) {
+        if (titleFind && data?.data) {
             dataUser = data.data.filter(x => {
                 return x.title.toLowerCase().includes(titleFind.toLowerCase())
             })
         }
         else {
-            dataUser = [...data.data]
+            dataUser = [...data?.data || []]
         }
         renderDataHouse(dataUser, dataMain)
 
@@ -355,7 +357,7 @@ const dataWareHouse = async (data = {}) => {
     const deleteBtn = document.querySelectorAll('.del-list')
     let tools = document.querySelector('.tools');
     const baseTools = tools.innerHTML
-    console.log(dataUser)
+
     const filter = document.querySelector("#filter")
     const filterContainer = document.querySelector("#filterContainer")
 
@@ -862,6 +864,8 @@ function loginForm() {
                 // Signed in 
                 onLoadSpan()
                 success("Bạn đã đăng nhập tài khoản thành công.")
+                document.querySelector('.main').innerHTML+=htmls.chat
+                chat()
                 signIn = true;
                 setTimeout(() => {
                     preLoad()
@@ -1201,6 +1205,8 @@ function signOut() {
         auth.signOut().then(() => {
             success('Đăng xuất thành công');
             signIn = false;
+            document.querySelector('.chat-container').outerHTML=""
+            document.querySelector('.button-chat_ct').outerHTML=""
             sessionStorage.removeItem('baseUser');
             accountSignIn.innerHTML = `<span  class="account-name btn btn-outline-primary btn-signIn ">Đăng nhập</span>`
             inforCurrentUser = {}
@@ -1356,31 +1362,36 @@ function renderRegister() {
             }
 
             // nếu chưa đăng kí thì add 
-            if (flag) {
-                // dien pos dk true
-                if (findIndex !== -1) {
-                    for (let i = start - 1; i < end - 1; i++) {
-                        (dataDate[findIndex].registerTime)[i] = true;
+            (async () => {
+                if (flag) {
+                    // dien pos dk true
+                    if (findIndex !== -1) {
+                        for (let i = start - 1; i < end - 1; i++) {
+                            (dataDate[findIndex].registerTime)[i] = true;
+                        }
+                        await pushDay(data, dataDate[findIndex].registerTime)
+
                     }
-                    pushDay(data, dataDate[findIndex].registerTime)
+                    else {
+                        const registerTime = new Array(24);
+                        registerTime.fill(false);
+                        for (let i = start - 1; i < end - 1; i++) {
+                            registerTime[i] = true;
+                        }
+                        await pushDay(data, registerTime)
+                    }
+                    document.querySelector('#title-form').value = "";
+                    document.querySelector('#description-form').value = "";
+                    timeStart.innerHTML = "--:-- AM"
+                    timeEnd.innerHTML = "--:-- AM"
+                    document.querySelector('.calendar-table-body').scrollTo(0, (start - 1) * height)
 
                 }
                 else {
-                    const registerTime = new Array(24);
-                    registerTime.fill(false);
-                    for (let i = start - 1; i < end - 1; i++) {
-                        registerTime[i] = true;
-                    }
-                    pushDay(data, registerTime)
+                    warning();
                 }
-                document.querySelector('#title-form').value = "";
-                document.querySelector('#description-form').value = "";
-                timeStart.innerHTML = "--:-- AM"
-                timeEnd.innerHTML = "--:-- AM"
-            }
-            else {
-                warning();
-            }
+
+            })()
 
         }
     }
@@ -1532,9 +1543,12 @@ function preLoad() {
     }
     if (where == 4) {
         for (let i = 0; i < dataDate.length; i++) {
-            const dayCheck = document.querySelectorAll(`#cal__days${dataDate[i].id_month} .daysInMonth`)[dataDate[i].date - 1]
+            if (dataDate[i].data.length > 0) {
+                const dayCheck = document.querySelectorAll(`#cal__days${dataDate[i].id_month} .daysInMonth`)[dataDate[i].date - 1]
 
-            dayCheck.style.border = "2px solid red";
+                dayCheck.style.border = "2px solid red";
+            }
+
         }
     }
 }
@@ -1833,6 +1847,78 @@ function renderPopupTime(data, index = -1, array = []) {
         timeTable.innerHTML = popupTime + timeTable.innerHTML;
     }
 }
+
+function chat(){
+    const btnSend = document.getElementById('btnSend')
+    const chatMain= document.getElementById('chatMain')
+    const chatData= document.getElementById('chatData')
+    const chatBox = document.getElementById('chatBox');
+    
+    const handleChat = (value) => {
+     
+        const htmls=`
+        <div class="chat-me"><span id="space"></span>
+        <div class="me chat-item">${value.toString()}</div>
+        </div>
+        `
+        chatData.innerHTML+=htmls
+        const loadCt=document.getElementById('load-ct')
+        loadCt.style.display="flex"
+        setTimeout(() => {
+            loadCt.style.display="none"
+        }, 2000);
+        chatMain.scrollTo(0,chatMain.scrollHeight)
+        chatMain.style.scrollBehavior = "smooth"
+        
+    }
+    document.getElementById('collapse').addEventListener('click', ()=>{
+        const chatContainer=document.querySelector('.chat-container')
+        if(chatContainer.classList.contains('collapsed')){
+            chatContainer.classList.remove('collapsed')
+            
+        }
+        else{
+            chatContainer.classList.add('collapsed')
+        }
+    })
+    const btnChat=document.querySelector('.button-chat_ct')
+    
+    document.getElementById('closeChat').addEventListener('click', () =>btnChat.click())
+    btnChat.addEventListener('click',()=>{
+        const chatContainer=document.querySelector('.chat-container')
+        if(!btnChat.classList.contains('act')){
+            chatContainer.style.display="flex"
+            btnChat.classList.add('act')
+    
+    
+        }
+        else{
+            chatContainer.style.display="none"
+            btnChat.classList.remove('act')
+    
+    
+        }
+    
+    })
+    chatBox.addEventListener('keyup', (e) => {
+        if(e.key==="Enter"){
+            
+            const data=chatBox.value.replace(/<[^>]+>/g, '')
+            if(data==="") return
+            chatBox.value=""
+            handleChat(data)
+        }
+        if (chatBox.value === "") {
+            if (btnSend.classList.contains('act'))
+                btnSend.classList.remove("act");
+        }
+        else {
+            btnSend.classList.add("act");
+        }
+    })
+    
+}
+
 prevBtn.onclick = () => {
     animTab(where);
 
@@ -1846,7 +1932,6 @@ prevBtn.onclick = () => {
 }
 nxtBtn.onclick = () => {
     animTab(where);
-
     if (date.getFullYear() === checkYear) {
         preLoad()
     }
@@ -1884,15 +1969,26 @@ cal_days.onclick = (e) => {
 }
 btnView.addEventListener('click', () => {
     view.forEach((item, idx) => {
-        item.addEventListener('click', () => {
+        item.addEventListener('click', async () => {
+
             if (date.getFullYear() === checkYear) {
                 preLoad()
             }
             else {
-                GetYearDate();
+                await GetYearDate();
                 checkYear = date.getFullYear();
+            }
+            if (idx == 3) {
+                const months = document.querySelectorAll('.calendar__index')
+                months.forEach((month, idx) => {
+                    month.addEventListener('click', () => {
+                        preLoad();
+                    });
+                })
             }
         });
     });
 });
+
 export default GetYearDate;
+
