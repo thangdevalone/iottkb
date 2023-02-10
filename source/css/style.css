@@ -794,7 +794,14 @@ input[type="number"]::-webkit-inner-spin-button {
   font-size: 12px;
 }
 .chat-row:hover #space >strong{
-  display: inline-block;
+  display: block;
+}
+.chat-me #space{
+  justify-content: flex-end;
+
+}
+.chat-me #space strong{
+  margin-right: 10px;
 }
 .chat-other {
   display: flex;

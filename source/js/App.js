@@ -2018,7 +2018,7 @@ async function loadMessages() {
         if (idx - 1 >= 0) {
             if (chatFetch[idx - 1].user.userID !== mess.user.userID) {
                 const htmls = `
-                  <div ${inforCurrentUser.userID !== mess.user.userID ? `style="margin-top:10px"` : ""} class=${inforCurrentUser.userID === mess.user.userID ? "chat-me chat-row" : "chat-other chat-row"}><span id="space"><strong>${dayjs(mess.timestamp).format("HH:MM")}</strong></span>
+                  <div ${inforCurrentUser.userID !== mess.user.userID ? `style="margin-top:10px"` : ""} class="${inforCurrentUser.userID === mess.user.userID ? "chat-me chat-row" : "chat-other chat-row"}"><span id="space"><strong>${dayjs(mess.timestamp).format("HH:MM")}</strong></span>
                   <div class="${inforCurrentUser.userID === mess.user.userID ? "me" : "other"}  chat-item">${inforCurrentUser.userID !== mess.user.userID ? `<div class="if-chat">${mess.user.name}</div>` : ""}${mess.text.toString()}</div>
                   ${inforCurrentUser.userID !== mess.user.userID ? `<img class="avt-chat" src="${mess.user.avt}" />` : ""}
                 
@@ -2029,7 +2029,7 @@ async function loadMessages() {
             }
             else {
                 const htmls = `
-                  <div class=${inforCurrentUser.userID === mess.user.userID ? "chat-me chat-row" : "chat-other chat-row"}><span id="space"><strong>${dayjs(mess.timestamp).format("HH:MM")}</strong></span>
+                  <div class="${inforCurrentUser.userID === mess.user.userID ? "chat-me chat-row" : "chat-other chat-row"}"><span id="space"><strong>${dayjs(mess.timestamp).format("HH:MM")}</strong></span>
                   <div class="${inforCurrentUser.userID === mess.user.userID ? "me" : "other"}  chat-item" style="margin-left:47px">${mess.text.toString()}</div>    
                   </div>
                   `
@@ -2037,7 +2037,7 @@ async function loadMessages() {
             }
         } else {
             const htmls = `
-                  <div class=${inforCurrentUser.userID === mess.user.userID ? "chat-me chat-row" : "chat-other chat-row"}><span id="space"><strong>${dayjs(mess.timestamp).format("HH:MM")}</strong></span>
+                  <div class="${inforCurrentUser.userID === mess.user.userID ? "chat-me chat-row" : "chat-other chat-row"}"><span id="space"><strong>${dayjs(mess.timestamp).format("HH:MM")}</strong></span>
                   <div class="${inforCurrentUser.userID === mess.user.userID ? "me" : "other"}  chat-item">${inforCurrentUser.userID !== mess.user.userID ? `<div class="if-chat">${mess.user.name}</div>` : ""}${mess.text.toString()}</div>
                   ${inforCurrentUser.userID !== mess.user.userID ? `<img class="avt-chat" src="${mess.user.avt}" />` : ""}
     
@@ -2129,7 +2129,7 @@ function chat() {
     const handleChat = (value) => {
 
         const htmls = `
-        <div class="chat-me"><span id="space"></span>
+        <div class="chat-me chat-row"><span id="space"></span>
         <div class="me chat-item">${value.toString()}</div>
         </div>
         `
