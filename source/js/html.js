@@ -558,7 +558,7 @@ const chat=`
       </div>
       <div class="chat-box pd-10">
 
-        <input type="text" id="chatBox" placeholder="Nhập tin nhắn...">
+        <input type="text" id="chatBox" placeholder="Nhập tin nhắn..." spellcheck="false">
         <div id="btnSend">
           <svg width="30" height="30" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
             <path

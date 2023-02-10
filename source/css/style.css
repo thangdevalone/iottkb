@@ -725,6 +725,8 @@ input[type="number"]::-webkit-inner-spin-button {
   box-shadow: rgba(0, 0, 0, 0.35) 0px 5px 15px;
   justify-content: center;
   background-color: #fff;
+  transition: transform 0.2s;
+  transform: background-color 0.2s;
 }
 .button-chat_ct.act {
   background-color: #80b5fb;
@@ -745,6 +747,9 @@ input[type="number"]::-webkit-inner-spin-button {
   display: none;
   flex-direction: column;
   transition: transform 0.5s;
+}
+.none{
+  display: none !important;
 }
 .chat-container.collapsed {
   transform: translateY(390px);
@@ -773,11 +778,23 @@ input[type="number"]::-webkit-inner-spin-button {
   display: flex;
   color: #fff;
 }
+
 .me {
   background-color: #80b5fb;
 }
 #space {
   flex: 1;
+  display: flex;
+  align-items: center;
+}
+#space strong{
+  display: none;
+  margin-left: 10px;
+  color: #836368;
+  font-size: 12px;
+}
+.chat-row:hover #space >strong{
+  display: inline-block;
 }
 .chat-other {
   display: flex;

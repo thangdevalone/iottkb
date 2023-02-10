@@ -82,7 +82,6 @@ function display(today = -1) {
 	const yearNow = date.getFullYear();
 	const dayCheck = allDates.querySelector(".active");
 	const day = dayCheck !== null ? dayCheck.innerHTML : date.getDate();
-	console.log(monthIndex,calMonth,day)
 	calMonth.innerHTML = twelveMonths[monthIndex][0].toUpperCase() + twelveMonths[monthIndex].slice(1);
 	calMonth.innerHTML += `, ${yearNow}`;
 	if (today === -1) {
@@ -172,6 +171,7 @@ const handleClickM = () => {
 			mapping(date);
 			glassCalendar();
 			animTab(3);
+			GetYearDate(2)
 			handleNP();
 		});
 	})

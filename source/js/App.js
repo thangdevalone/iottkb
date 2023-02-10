@@ -2,7 +2,7 @@ import toast from "./toastMes.js";
 import animTab from "./calendar.js";
 import form from "./formHtml.js";
 import features from "./features.js";
-
+import "https://cdn.jsdelivr.net/npm/dayjs@1/dayjs.min.js"
 // Import the functions you need from the SDKs you need
 import { initializeApp } from "https://www.gstatic.com/firebasejs/9.13.0/firebase-app.js";
 
@@ -253,7 +253,7 @@ const handleFeatures = () => {
         onLoadSpan()
         const docSnap = await getDoc(doc(db, `data`, `${inforCurrentUser.userID}`));
         onLoadSpan()
-        dataWareHouse(docSnap.data())
+        dataWareHouse(docSnap.data()?.data || [])
     });
     document.getElementById('logDataAnalystics').addEventListener('click', () => { dataAnalystic() });
     document.getElementById('logCreateAccount')?.addEventListener('click', () => {
@@ -319,7 +319,7 @@ const dataAnalystic = async () => {
                             fill: false,
                             enabled: false,
                             borderColor: '#021C43',
-                            tension: 0,
+                            tension: 0.2,
                             pointStyle: 'circle',
                             pointRadius: 10,
                             pointHoverRadius: 15
@@ -343,8 +343,10 @@ const dataAnalystic = async () => {
 }
 
 
-const dataWareHouse = async (data = {}) => {
-    let dataUser = [...data?.data || []];
+const dataWareHouse = async (data = [], df = 1) => {
+
+    let init = [...data || []]
+    let dataUser = [...data || []];
     const modal = document.querySelector('.modal-features')
     modal.style.display = "flex";
     modal.classList.add('on')
@@ -356,17 +358,28 @@ const dataWareHouse = async (data = {}) => {
         modal.innerHTML = ""
     }
     const dataMain = document.querySelector('.data-main')
-    renderDataHouse(dataUser, dataMain)
+    const myData = document.getElementById("myData")
+    const allData = document.getElementById("allData")
     function handleFindData(titleFind) {
-        if (titleFind && data?.data) {
-            dataUser = data.data.filter(x => {
+        if (titleFind && data) {
+            dataUser = data.filter(x => {
                 return x.title.toLowerCase().includes(titleFind.toLowerCase())
             })
         }
         else {
-            dataUser = [...data?.data || []]
+            dataUser = [...data || []]
         }
         renderDataHouse(dataUser, dataMain)
+
+    }
+    if (df === 1) {
+        myData.checked = true
+    renderDataHouse(dataUser, dataMain)
+
+    }
+    if (df === 2) {
+        allData.checked = true
+    renderDataHouse(dataUser, dataMain,1)
 
     }
     const allDataList = document.querySelectorAll('.data-list')
@@ -376,6 +389,49 @@ const dataWareHouse = async (data = {}) => {
 
     const filter = document.querySelector("#filter")
     const filterContainer = document.querySelector("#filterContainer")
+
+   
+    const reData = {
+        renderMyData: () => {
+            myData.addEventListener("change", (e) => {
+                if (e.target.checked) {
+                    onLoadSpan();
+                    (async () => {
+                        const docSnap = await getDoc(doc(db, `data`, `${inforCurrentUser.userID}`));
+                        onLoadSpan()
+                        dataWareHouse(docSnap.data()?.data || [])
+                    })()
+
+                }
+            })
+        },
+        renderAllData: () => {
+            allData.addEventListener("change", (e) => {
+                if (e.target.checked) {
+                    dataUser = [];
+                    onLoadSpan();
+                    (async () => {
+                        try {
+                            const querySnapshot = await getDocs(collection(db, `data`));
+                            onLoadSpan();
+                            querySnapshot.forEach((doc) => {
+
+                                dataUser = [...dataUser, ...doc.data().data]
+
+                            })
+                            dataWareHouse(dataUser, 2)
+
+
+                        } catch (error) {
+                            console.log(error);
+                        }
+                    })()
+                }
+            })
+        }
+    }
+    reData.renderAllData()
+    reData.renderMyData()
 
     filter.addEventListener('change', () => {
         if (filter.value === "date") {
@@ -418,7 +474,7 @@ const dataWareHouse = async (data = {}) => {
                     return;
                 }
 
-                dataUser = data.data.filter(x => {
+                dataUser = init.filter(x => {
                     const arrayDate = x.date.split("-")
                     console.log(arrayDate)
                     if (dayValue === "" && monthValue === "" && yearValue === "") {
@@ -459,10 +515,32 @@ const dataWareHouse = async (data = {}) => {
             del(dataUser[i].idData, 0, { _thisDay: day[0], _thisMonth: day[1], _thisYear: day[2] })
                 .then(() => {
                     success('Xóa thành công!');
-                    (async () => {
-                        const docSnap = await getDoc(doc(db, `data`, `${inforCurrentUser.userID}`));
-                        dataWareHouse(docSnap.data())
-                    })()
+                    if (df === 1) {
+                        (async () => {
+                            const docSnap = await getDoc(doc(db, `data`, `${inforCurrentUser.userID}`));
+                            dataWareHouse(docSnap.data()?.data || [])
+                        })()
+                    }
+
+                    if (df === 2) {
+                        dataUser = [];
+                        (async () => {
+                            try {
+                                const querySnapshot = await getDocs(collection(db, `data`));
+
+                                querySnapshot.forEach((doc) => {
+
+                                    dataUser = [...dataUser, ...doc.data().data]
+
+                                })
+                                dataWareHouse(dataUser, 2)
+
+
+                            } catch (error) {
+                                console.log(error);
+                            }
+                        })()
+                    }
                 })
                 .catch((e) => {
                     fail('Xóa không thành công!')
@@ -513,10 +591,33 @@ const dataWareHouse = async (data = {}) => {
                     })()
                         .then(() => {
                             success('Xóa thành công!');
-                            (async () => {
-                                const docSnap = await getDoc(doc(db, `data`, `${inforCurrentUser.userID}`));
-                                dataWareHouse(docSnap.data())
-                            })()
+                            if (df === 1) {
+                                (async () => {
+                                    const docSnap = await getDoc(doc(db, `data`, `${inforCurrentUser.userID}`));
+                                    dataWareHouse(docSnap.data()?.data || [])
+                                })()
+                            }
+
+                            if (df === 2) {
+                                dataUser = [];
+                                    (async () => {
+                                        try {
+                                            const querySnapshot = await getDocs(collection(db, `data`));
+                                      
+                                            querySnapshot.forEach((doc) => {
+
+                                                dataUser = [...dataUser, ...doc.data().data]
+
+                                            })
+                                            dataWareHouse(dataUser, 2)
+
+
+                                        } catch (error) {
+                                            console.log(error);
+                                        }
+                                    })()
+                            }
+
                         })
                         .catch((e) => {
                             fail('Xóa không thành công!')
@@ -548,8 +649,9 @@ const dataWareHouse = async (data = {}) => {
                 allDataList.forEach((item, idx) => {
                     item.style.cursor = 'pointer'
                     item.addEventListener('click', (e) => {
-                        if (e.target.tagName == 'INPUT') return;
+                   
                         const tg = e.target.closest('.data-list')
+                        if (e.target.tagName == 'INPUT' || tg.getAttribute("data-author")!==inforCurrentUser.userID) return;
                         console.log(tg)
                         if (tg) {
                             allSelect[idx].checked = !allSelect[idx].checked
@@ -578,16 +680,35 @@ const dataWareHouse = async (data = {}) => {
             }
         }
         if (target.closest("#export")) {
-            const configData = dataUser.map((item) => {
-                return [
-                    item.title,
-                    item.bodyTitle,
-                    item.date,
-                    item.timeStart,
-                    item.timeEnd,
-                ]
-            })
-            const resuilt = [["Tiêu đề", "Mô tả", "Ngày", "Giờ bắt đầu", "Giờ kết thúc"], ...configData]
+            let configData=[]
+            let resuilt=[]
+            if(df==1){
+                configData = dataUser.map((item) => {
+                    return [
+                        item.title,
+                        item.bodyTitle,
+                        item.date,
+                        item.timeStart,
+                        item.timeEnd,
+                    ]
+                })
+                resuilt = [["Tiêu đề", "Mô tả", "Ngày", "Giờ bắt đầu", "Giờ kết thúc"], ...configData]
+            }
+            if(df==2){
+                configData = dataUser.map((item) => {
+                    return [
+                        item.name_author,
+                        item.title,
+                        item.bodyTitle,
+                        item.date,
+                        item.timeStart,
+                        item.timeEnd,
+                    ]
+                })
+                resuilt = [["Tên người đăng kí","Tiêu đề", "Mô tả", "Ngày", "Giờ bắt đầu", "Giờ kết thúc"], ...configData]
+            }
+
+
             var workbook = XLSX.utils.book_new(),
                 worksheet = XLSX.utils.aoa_to_sheet(resuilt);
             XLSX.utils.book_append_sheet(workbook, worksheet, "WebCalendar")
@@ -597,12 +718,12 @@ const dataWareHouse = async (data = {}) => {
     })
 
 }
-function renderDataHouse(data = {}, element) {
+function renderDataHouse(data = {}, element, cf = 0) {
     const html = data.map(doc => {
         return `
-        <div class="data-list" id=${doc.idData}>
-        <input type="checkbox" class="select-list" id=${doc.idData}/>
-            <div class="del-list" id=${doc.idData}>
+        <div class="data-list" id=${doc.idData} data-author=${doc.author}>
+        ${inforCurrentUser.userID === doc.author ? `<input type="checkbox" class="select-list" id=${doc.idData}/>` : `<input type="checkbox" class=" none select-list" id=${doc.idData}/>`}
+            <div class="del-list ${inforCurrentUser.userID === doc.author ? "":"none"}" id=${doc.idData}>
             <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
       <path d="M8.81 2L5.19 5.63" stroke="#000" stroke-width="1.5" stroke-miterlimit="10" stroke-linecap="round" stroke-linejoin="round"/>
       <path d="M15.19 2L18.81 5.63" stroke="#000" stroke-width="1.5" stroke-miterlimit="10" stroke-linecap="round" stroke-linejoin="round"/>
@@ -612,7 +733,7 @@ function renderDataHouse(data = {}, element) {
       <path d="M3.5 10L4.91 18.64C5.23 20.58 6 22 8.86 22H14.89C18 22 18.46 20.64 18.82 18.76L20.5 10" stroke="#292D32" stroke-width="1.5" stroke-linecap="round"/>
       </svg>
             </div>
-
+            ${cf === 1 ? `<div class="data-des">${doc.name_author}</div>` : ""}
             <div class="data-des">${doc.title}</div>
             <div class="data-des">${doc.timeStart}<i class="fa-solid fa-minus"></i>${doc.timeEnd}</div>
             <div class="data-des">${doc.date}</div>
@@ -788,15 +909,18 @@ const featureInfor = () => {
 
 
 // update DateDate
-async function GetYearDate() {
-    dataDate = []
-    const x = []
-    const querrySnapshot = await getDocs(collection(db, `${date.getFullYear()}`));
-    querrySnapshot.forEach(doc => {
-        x.push(doc.data());
-    })
-    dataDate = [...x]
-
+async function GetYearDate(cf=1) {
+    if(cf==1){
+        dataDate = []
+        const x = []
+        const querrySnapshot = await getDocs(collection(db, `${date.getFullYear()}`));
+        querrySnapshot.forEach(doc => {
+            x.push(doc.data());
+        })
+        dataDate = [...x]
+    }
+    
+    
     preLoad()
 }
 
@@ -883,6 +1007,7 @@ function loginForm() {
                 document.querySelector('.modal-chat').innerHTML = htmls.chat
                 chat()
                 signIn = true;
+                console.log(containerForm)
                 setTimeout(() => {
                     preLoad()
                     containerForm.style.display = "none"
@@ -893,7 +1018,16 @@ function loginForm() {
             })
             .catch((e) => {
                 onLoadSpan()
-                fail("Đăng nhập không thành công!")
+                console.log(e.code)
+                if (e.code === "auth/wrong-password") {
+                    fail("Sai mật khẩu! Vui lòng nhập lại")
+                }
+                else if (e.code === "auth/user-not-found") {
+                    fail("Tài khoản không tồn tại")
+                } else {
+                    fail("Đăng nhập không thành công!")
+
+                }
             });
     })
 
@@ -1221,7 +1355,7 @@ function signOut() {
         auth.signOut().then(() => {
             success('Đăng xuất thành công');
             signIn = false;
-            document.querySelector('.modal-chat').outerHTML = ""
+            document.querySelector('.modal-chat').innerHTML = ""
 
             sessionStorage.removeItem('baseUser');
             accountSignIn.innerHTML = `<span  class="account-name btn btn-outline-primary btn-signIn ">Đăng nhập</span>`
@@ -1400,7 +1534,9 @@ function renderRegister() {
                     document.querySelector('#description-form').value = "";
                     timeStart.innerHTML = "--:-- AM"
                     timeEnd.innerHTML = "--:-- AM"
-                    document.querySelector('.calendar-table-body').scrollTo(0, (start - 1) * height)
+                    const calenBD = document.querySelector('.calendar-table-body')
+                    if (calenBD)
+                        calenBD.scrollTo(0, (start - 1) * height)
 
                 }
                 else {
@@ -1412,7 +1548,6 @@ function renderRegister() {
         }
     }
 }
-
 
 
 
@@ -1430,6 +1565,7 @@ async function pushDay(data, registerTime) {
         const refreshData = {
             idData: data.idData,
             author: data.author,
+            name_author: inforCurrentUser.name,
             timeStart: data.timeStart,
             timeEnd: data.timeEnd,
             bodyTitle: data.bodyTitle,
@@ -1509,7 +1645,9 @@ function preLoad() {
         allPopup[i].outerHTML = ""
     }
     //đang ở view ngày
+
     if (where == 1) {
+        handleScroll()
         const dayCheck = cal_days.querySelector(".active");
         const day = dayCheck !== null ? Number(dayCheck.innerHTML) : date.getDate();
         const findIndex = dataDate.findIndex(x => (x.id_month == date.getMonth() + 1 && x.date == day));
@@ -1768,7 +1906,7 @@ const delPopUp = (e) => {
 
 async function del(id_del, modal = 0, { _thisDay = 0, _thisMonth = 0, _thisYear = 0 }) {
     onLoadSpan()
-
+    console.log(id_del, modal, { _thisDay, _thisMonth, _thisYear })
     async function getData() {
         const docSnap1 = await getDoc(doc(db, `${_thisYear}`, `${_thisDay}-${_thisMonth}-${_thisYear}`));
         const docSnap2 = await getDoc(doc(db, `data`, `${inforCurrentUser.userID}`));
@@ -1776,12 +1914,10 @@ async function del(id_del, modal = 0, { _thisDay = 0, _thisMonth = 0, _thisYear 
     }
     async function editData() {
         const [data1, data2] = await getData()
-
         const [dataList1, dataList2] = [data1.data, data2.data];
 
-        console.log(dataList1, dataList2)
         const findData = dataList1.filter(x => { return x.idData === id_del })[0]
-        const capacity = [...findData.capacity]
+        const capacity = [...findData?.capacity || []]
         // change mang time
         const newRegisterTime = data1.registerTime.map((x, idx) => {
             if (capacity.findIndex(x => x === idx) !== -1) {
@@ -1863,52 +1999,53 @@ function renderPopupTime(data, index = -1, array = []) {
         timeTable.innerHTML = popupTime + timeTable.innerHTML;
     }
 }
+let chatFetch = []
 async function loadMessages() {
+    chatFetch = []
     // Create the query to load the last 12 messages and listen for new ones.
-    const recentMessagesQuery = query(collection(getFirestore(), 'messages'), orderBy('timestamp', 'asc'), limit(12));
+    const recentMessagesQuery = query(collection(getFirestore(), 'messages'), orderBy('timestamp', 'asc'));
     const chatData = document.getElementById('chatData');
     chatData.innerHTML = "";
 
     const queryData = await getDocs(recentMessagesQuery)
-
-    const x=[]
     queryData.forEach((doc) => {
 
         const message = { ...doc.data(), timestamp: doc.data().timestamp?.toDate(), id: doc.id };
-        x.push(message);
+
+        chatFetch.push(message);
     })
-    x.forEach(((mess,idx)=>{
-        if(idx-1>=0){
-            if (x[idx-1].user.userID!==mess.user.userID) {
+    chatFetch.forEach(((mess, idx) => {
+        if (idx - 1 >= 0) {
+            if (chatFetch[idx - 1].user.userID !== mess.user.userID) {
                 const htmls = `
-                  <div ${inforCurrentUser.userID !== mess.user.userID ?`style="margin-top:10px"`:""} class=${inforCurrentUser.userID === mess.user.userID ? "chat-me" : "chat-other"}><span id="space"></span>
-                  <div class="${inforCurrentUser.userID === mess.user.userID ? "me" : "other"}  chat-item">${inforCurrentUser.userID !== mess.user.userID ?`<div class="if-chat">${mess.user.name}</div>`:""}${mess.text.toString()}</div>
-                  ${inforCurrentUser.userID !== mess.user.userID ? `<img class="avt-chat" src="${mess.user.avt}" />`:""}
-    
-                  </div>
+                  <div ${inforCurrentUser.userID !== mess.user.userID ? `style="margin-top:10px"` : ""} class=${inforCurrentUser.userID === mess.user.userID ? "chat-me chat-row" : "chat-other chat-row"}><span id="space"><strong>${dayjs(mess.timestamp).format("HH:MM")}</strong></span>
+                  <div class="${inforCurrentUser.userID === mess.user.userID ? "me" : "other"}  chat-item">${inforCurrentUser.userID !== mess.user.userID ? `<div class="if-chat">${mess.user.name}</div>` : ""}${mess.text.toString()}</div>
+                  ${inforCurrentUser.userID !== mess.user.userID ? `<img class="avt-chat" src="${mess.user.avt}" />` : ""}
+                
+                  </div></span>
                   `
                 chatData.innerHTML += htmls
-    
+
             }
-            else{
+            else {
                 const htmls = `
-                  <div class=${inforCurrentUser.userID === mess.user.userID ? "chat-me" : "chat-other"}><span id="space"></span>
+                  <div class=${inforCurrentUser.userID === mess.user.userID ? "chat-me chat-row" : "chat-other chat-row"}><span id="space"><strong>${dayjs(mess.timestamp).format("HH:MM")}</strong></span>
                   <div class="${inforCurrentUser.userID === mess.user.userID ? "me" : "other"}  chat-item" style="margin-left:47px">${mess.text.toString()}</div>    
                   </div>
                   `
                 chatData.innerHTML += htmls
             }
-        }else{
+        } else {
             const htmls = `
-                  <div class=${inforCurrentUser.userID === mess.user.userID ? "chat-me" : "chat-other"}><span id="space"></span>
-                  <div class="${inforCurrentUser.userID === mess.user.userID ? "me" : "other"}  chat-item">${inforCurrentUser.userID !== mess.user.userID ?`<div class="if-chat">${mess.user.name}</div>`:""}${mess.text.toString()}</div>
-                  ${inforCurrentUser.userID !== mess.user.userID ? `<img class="avt-chat" src="${mess.user.avt}" />`:""}
+                  <div class=${inforCurrentUser.userID === mess.user.userID ? "chat-me chat-row" : "chat-other chat-row"}><span id="space"><strong>${dayjs(mess.timestamp).format("HH:MM")}</strong></span>
+                  <div class="${inforCurrentUser.userID === mess.user.userID ? "me" : "other"}  chat-item">${inforCurrentUser.userID !== mess.user.userID ? `<div class="if-chat">${mess.user.name}</div>` : ""}${mess.text.toString()}</div>
+                  ${inforCurrentUser.userID !== mess.user.userID ? `<img class="avt-chat" src="${mess.user.avt}" />` : ""}
     
                   </div>
                   `
-                chatData.innerHTML += htmls
+            chatData.innerHTML += htmls
         }
-  
+
     }))
 
 
@@ -1916,32 +2053,71 @@ async function loadMessages() {
     // Start listening to the query.
 
 }
+const handleScroll = () => {
+    const calenBD = document.querySelector('.calendar-table-body')
+    if (calenBD)
+        calenBD.addEventListener('wheel', findScrollDirectionOtherBrowsers, { passive: true });
+
+
+    function findScrollDirectionOtherBrowsers(event) {
+        var delta;
+        if (event.wheelDelta) {
+            delta = event.wheelDelta;
+        } else {
+            delta = -1 * event.deltaY;
+        }
+        console.log(delta);
+        const btnChat = document.querySelector('.button-chat_ct')
+        if (btnChat) {
+            if (delta < 0) {
+                btnChat.style.transform = "translateY(100px)"
+
+            } else if (delta > 0) {
+                btnChat.style.transform = "translateY(0px)"
+
+
+            }
+        }
+
+    }
+}
 function chat() {
     const btnSend = document.getElementById('btnSend')
     const chatMain = document.getElementById('chatMain');
     const chatData = document.getElementById('chatData');
     const chatBox = document.getElementById('chatBox');
-    
+
     onSnapshot(query(collection(getFirestore(), 'messages'), orderBy('timestamp', 'desc')), function (snapshot) {
         snapshot.docChanges().forEach(function (change) {
 
             const message = { ...change.doc.data(), timestamp: change.doc.data().timestamp?.toDate(), id: change.doc.id };
+            chatFetch.push(message);
             if (inforCurrentUser.userID !== change.doc.data().user.userID) {
-                const htmls = `
-                    <div class="chat-other"><span id="space"></span>
-                    <div class="other  chat-item"><div class="if-chat">${message.user.name}</div>${message.text.toString()}</div>
-                    <img class="avt-chat" src="${message.user.avt}" />
-                    </div>
+                let htmls = ""
+                if (chatFetch.length >= 2 && chatFetch[chatFetch.length - 1].user.userID === chatFetch[chatFetch.length - 2].user.userID) {
+                    htmls = `
+                        <div class="chat-other chat-row"><span id="space"><strong>${dayjs(message.timestamp).format("HH:MM")}</strong>}</span>
+                        <div class="other chat-item" style="margin-left:47px">${message.text.toString()}</div>    
+                        </div>
                     `
+                } else {
+                    htmls = `
+                        <div class="chat-other chat-row" style="margin-top:10px"><span id="space"><strong>${dayjs(message.timestamp).format("HH:MM")}</strong></span>
+                        <div class="other  chat-item"><div class="if-chat">${message.user.name}</div>${message.text.toString()}</div>
+                        <img class="avt-chat" src="${message.user.avt}" />
+                        </div>
+                    `
+                }
+
                 const save = Math.floor(chatMain.scrollTop)
                 const base = Math.floor(chatMain.scrollHeight)
                 chatData.innerHTML += htmls
-                const check = 
-                chatMain.offsetHeight === base - save || 
-                chatMain.offsetHeight + 1 === base - save || 
-                chatMain.offsetHeight + 2 === base - save || 
-                chatMain.offsetHeight - 1 === base - save || 
-                chatMain.offsetHeight - 2 === base - save
+                const check =
+                    chatMain.offsetHeight === base - save ||
+                    chatMain.offsetHeight + 1 === base - save ||
+                    chatMain.offsetHeight + 2 === base - save ||
+                    chatMain.offsetHeight - 1 === base - save ||
+                    chatMain.offsetHeight - 2 === base - save
                 if (check)
                     chatMain.scrollTo(0, chatMain.scrollHeight)
 

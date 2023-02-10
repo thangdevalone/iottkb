@@ -131,7 +131,7 @@
 }
 .wareHouse-bottom .data-main{
     overflow-y: scroll;
-    height: calc(100% - 50px);
+    height: calc(100% - 80px);
     display: flex;
     flex-direction: column;
 }  
@@ -139,7 +139,8 @@
     display: flex;
     align-items: center;
     position: relative;
-    height: 50px;
+    min-height: 50px;
+
     font-weight: 500;
     font-size: 16px;
     background-color: rgb(248 157 157 / 35%);

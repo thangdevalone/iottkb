@@ -168,7 +168,7 @@ const feature_wareHouse = `
     </select>
     </div>
     <div style="margin-left:20px">
-    <input type="radio" id="myData" name="data" checked/>
+    <input type="radio" id="myData" name="data" />
     <label for="myData">Dữ liệu của tôi</label>
     <input  style="margin-left:10px" type="radio" id="allData" name="data"/>
     <label for="allData">Dữ liệu tất cả</label>
